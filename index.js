@@ -1,7 +1,7 @@
 /* jshint node: true, esversion:6 */
 /**
  * HappyNodeTokenizer
- * v0.0.1
+ * v0.0.2
  *
  * A basic, Twitter-aware tokenizer.
  *
