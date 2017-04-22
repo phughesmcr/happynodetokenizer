@@ -1,7 +1,7 @@
 /* jshint node: true, esversion:6 */
 /**
  * HappyNodeTokenizer
- * v0.0.2
+ * v0.0.3
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -32,11 +32,21 @@
  * @return {array}
  */
 
+"use strict";
 ;(function () {
   const root = this;
   const previous = root.tokenizer;
 
-  const he = require('he');
+  const has_require = typeof require !== 'undefined';
+
+  let he = root.he;
+
+  if( typeof _ === 'undefined' ) {
+    if( has_require ) {
+     he = require('he');
+    }
+    else throw new Error('happynodetokenizer requires "he" module.');
+  }
 
   const tokenizer = (str, opts) => {
     // make sure there is input before proceeding
@@ -58,17 +68,17 @@
     if (typeof str !== 'string') str = str.toString();
 
     // define regular expressions
-    var phoneNumber = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})/, "g");
-    var emoticon = new RegExp(/(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX/\:\}\{@\|\\]|[\)\]\(\[dDpPxX/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)/, "g");
-    var webAddress = new RegExp(/(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))/, "gi");
-    var webProtocol = new RegExp(/(?:http[s]?\:\/\/)/, "gi");
-    var parens = new RegExp(/(?:\[[a-z_]+\])/, "gi");
-    var httpGet = new RegExp(/(?:\/\w+\?(?:\;?\w+\=\w+)+)/, "gi");
-    var htmlTags = new RegExp(/<[^>]+>/, "gi");
-    var twitterName = new RegExp(/(?:@[\w_]+)/, "gi");
-    var hashtag = new RegExp(/(?:\#+[\w_]+[\w\'_\-]*[\w_]+)/, "gi");
-    var remains = new RegExp(/(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, "gi");
-    var fullExp = new RegExp(
+    let phoneNumber = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})/, "g");
+    let emoticon = new RegExp(/(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX/\:\}\{@\|\\]|[\)\]\(\[dDpPxX/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)/, "g");
+    let webAddress = new RegExp(/(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))/, "gi");
+    let webProtocol = new RegExp(/(?:http[s]?\:\/\/)/, "gi");
+    let parens = new RegExp(/(?:\[[a-z_]+\])/, "gi");
+    let httpGet = new RegExp(/(?:\/\w+\?(?:\;?\w+\=\w+)+)/, "gi");
+    let htmlTags = new RegExp(/<[^>]+>/, "gi");
+    let twitterName = new RegExp(/(?:@[\w_]+)/, "gi");
+    let hashtag = new RegExp(/(?:\#+[\w_]+[\w\'_\-]*[\w_]+)/, "gi");
+    let remains = new RegExp(/(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, "gi");
+    let fullExp = new RegExp(
       phoneNumber.source + "|" +
       emoticon.source + "|" +
       webAddress.source + "|" +
@@ -81,10 +91,10 @@
       remains.source, "gi");
 
     // fix HTML elements
-    var unicode = he.decode(str);
+    let unicode = he.decode(str);
 
     // tokenize!
-    var tokens = unicode.match(fullExp);
+    let tokens = unicode.match(fullExp);
 
     if (opts.output == 'string') {
       // make the tokens array into a string and return

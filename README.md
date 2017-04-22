@@ -5,7 +5,7 @@ A basic, Twitter-aware tokenizer.
 Based on HappierFunTokenizing.py - Copyright 2011, Christopher Potts
 by: Christopher Potts, updated: H. Andrew Schwartz
 
-## Useage
+## Usage
 ```Javascript
 const hnt = require('happynodetokenizer')
 let text = "A long string of text...."
