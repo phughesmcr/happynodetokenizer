@@ -1,0 +1,7 @@
+{
+  "asi":          true,
+  "node":         true,
+  "eqnull":       true,
+  "-W041":        true,
+  "esversion":    6
+}
