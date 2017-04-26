@@ -17,8 +17,10 @@ let tokens = htn(text, options)
 ```
 
 ### Options
-* output: "array" or "string" - type of element to return
-* delim: " " - delimiter for string outputs, can be any string
+```Markdown
+output: "array" or "string" - type of element to return
+delim: " " - delimiter for string outputs, can be any string
+```
 
 ## Licence
 [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/)
