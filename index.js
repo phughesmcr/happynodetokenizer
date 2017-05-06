@@ -1,6 +1,6 @@
 /**
  * HappyNodeTokenizer
- * v0.1.0
+ * v0.1.1
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -16,19 +16,19 @@
  *
  * Default options (opts):
  *  {
- *    "output": "array",  // output end result as an "array" or "string"
+ *    "output": "array",  // output end result as an "array" (default) or "string"
  *    "delim": ","        // delimiter for string outputs
  *  }
  *
  * Useage example:
  * const hnt = require('happynodetokenizer);
  * const text = "A big long string of text...";
- * let tokens = hnt(text, {"output": "string", "delim": " "});
+ * let tokens = hnt(text, {"output": "array", "delim": ","});
  * console.log(tokens)
  *
- * @param {string} str  {input string to tokenize}
- * @param {object} opts {options}
- * @return {array}
+ * @param {string} str  input string to tokenize
+ * @param {Object} opts options
+ * @return {Array|string}
  */
 
 'use strict'
@@ -65,9 +65,9 @@
     // define regex
     const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gi')
     // fix HTML elements
-    let unicode = he.decode(str)
+    const unicode = he.decode(str)
     // tokenize!
-    let tokens = unicode.match(reg)
+    const tokens = unicode.match(reg)
     if (opts.output === 'string') {
       // make the tokens array into a string and return
       return tokens.join(opts.delim)

@@ -10,7 +10,7 @@ by: Christopher Potts, updated: H. Andrew Schwartz
 const hnt = require('happynodetokenizer')
 let text = "A long string of text...."
 let options = {
-  "output": "array",
+  "output": "array",  // (array is default output)
   "delim": ","
 }
 let tokens = htn(text, options)
