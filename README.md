@@ -6,21 +6,24 @@ Based on HappierFunTokenizing.py - Copyright 2011, Christopher Potts
 by: Christopher Potts, updated: H. Andrew Schwartz
 
 ## Usage
-```Javascript
-const hnt = require('happynodetokenizer')
-let text = "A long string of text...."
-let options = {
-  "output": "array",  // (array is default output)
-  "delim": ","
-}
-let tokens = htn(text, options)
+```javascript
+const hnt = require("happynodetokenizer");
+const text = "A big long string of text...";
+const opts = {"output": "array", "delim": ","}
+const tokens = hnt(text, opts);
+console.log(tokens)
 ```
 
-### Options
-```Markdown
-output: "array" or "string" - type of element to return
-delim: " " - delimiter for string outputs, can be any string
-```
+## Options
+### "output"
+A string. The type of element to return.
+
+Valid options: "array" (default) or "string"
+
+### "delim"
+A string. The delimiter for string outputs, can be any string.
+
+Default: ","
 
 ## Licence
-[Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/)
+[Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/).

@@ -1,6 +1,6 @@
 /**
  * HappyNodeTokenizer
- * v0.1.1
+ * v0.1.2
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -17,18 +17,19 @@
  * Default options (opts):
  *  {
  *    "output": "array",  // output end result as an "array" (default) or "string"
- *    "delim": ","        // delimiter for string outputs
+ *    "delim": ","        // delimiter for string outputs (default = ",")
  *  }
  *
- * Useage example:
- * const hnt = require('happynodetokenizer);
+ * Usage example:
+ * const hnt = require("happynodetokenizer");
  * const text = "A big long string of text...";
- * let tokens = hnt(text, {"output": "array", "delim": ","});
+ * const opts = {"output": "array", "delim": ","}
+ * const tokens = hnt(text, opts);
  * console.log(tokens)
  *
  * @param {string} str  input string to tokenize
  * @param {Object} opts options
- * @return {Array|string}
+ * @return {Array|string} return array or string depending on opts.output
  */
 
 'use strict'
@@ -36,12 +37,10 @@
   const root = this
   const previous = root.tokenizer
 
-  const hasRequire = typeof require !== 'undefined'
-
   let he = root.he
 
-  if (typeof _ === 'undefined') {
-    if (hasRequire) {
+  if (typeof he === 'undefined') {
+    if (typeof require !== 'undefined') {
       he = require('he')
     } else throw new Error('happynodetokenizer requires "he" module.')
   }
@@ -49,6 +48,8 @@
   const tokenizer = (str, opts) => {
     // if there is no string return null
     if (str == null) return null
+    // ensure we're dealing with a string
+    if (typeof str !== 'string') str = str.toString()
     // set default options if none are provided
     if (opts == null) {
       opts = {
@@ -60,8 +61,6 @@
     opts.output = opts.output || 'array'
     // if string output is chosen but no delimiter is given default to csv
     opts.delim = opts.delim || ','
-    // ensure we're dealing with a string
-    if (typeof str !== 'string') str = str.toString()
     // define regex
     const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gi')
     // fix HTML elements
