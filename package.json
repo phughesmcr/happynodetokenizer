@@ -1,6 +1,6 @@
 {
   "name": "happynodetokenizer",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A simple, Twitter-aware tokenizer.",
   "main": "index.js",
   "keywords": [

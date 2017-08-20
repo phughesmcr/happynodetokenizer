@@ -14,16 +14,22 @@ const tokens = hnt(text, opts);
 console.log(tokens)
 ```
 
+The opts object is optional.
+
+If no tokens are found, happynodetokenizer will return null.
+
 ## Options
 ### "output"
-A string. The type of element to return.
+The type of element to return.
 
 Valid options: "array" (default) or "string"
 
 ### "delim"
-A string. The delimiter for string outputs, can be any string.
+The delimiter for string outputs, can be any string.
 
 Default: ","
 
 ## Licence
+(C) 2017 [P. Hughes](www.phugh.es)
+
 [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/).

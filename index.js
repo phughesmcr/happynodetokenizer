@@ -1,6 +1,6 @@
 /**
  * HappyNodeTokenizer
- * v0.1.2
+ * v0.2.0
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -16,7 +16,7 @@
  *
  * Default options (opts):
  *  {
- *    "output": "array",  // output end result as an "array" (default) or "string"
+ *    "output": "array",  // output tokens as an "array" (default) or "string"
  *    "delim": ","        // delimiter for string outputs (default = ",")
  *  }
  *
@@ -28,65 +28,68 @@
  * console.log(tokens)
  *
  * @param {string} str  input string to tokenize
- * @param {Object} opts options
- * @return {Array|string} return array or string depending on opts.output
+ * @param {Object} opts  options
+ * @return {(Array|string)}  return array or string depending on opts.output
  */
 
 'use strict'
-;(function () {
-  const root = this
-  const previous = root.tokenizer
+;(function() {
+  const global = this;
+  const previous = global.tokenizer;
 
-  let he = root.he
+  let he = global.he;
 
   if (typeof he === 'undefined') {
     if (typeof require !== 'undefined') {
-      he = require('he')
-    } else throw new Error('happynodetokenizer requires "he" module.')
+      he = require('he');
+    } else throw new Error('happynodetokenizer requires "he" module.');
   }
 
   const tokenizer = (str, opts) => {
     // if there is no string return null
-    if (str == null) return null
+    if (!str) return null;
     // ensure we're dealing with a string
-    if (typeof str !== 'string') str = str.toString()
+    if (typeof str !== 'string') str = str.toString();
     // set default options if none are provided
-    if (opts == null) {
+    if (!opts) {
       opts = {
         'output': 'array',
-        'delim': ','
-      }
+        'delim': ',',
+      };
     }
     // if no output type is specified default to array
-    opts.output = opts.output || 'array'
+    opts.output = opts.output || 'array';
     // if string output is chosen but no delimiter is given default to csv
-    opts.delim = opts.delim || ','
+    opts.delim = opts.delim || ',';
     // define regex
-    const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gi')
+    const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gi');
     // fix HTML elements
-    const unicode = he.decode(str)
+    const unicode = he.decode(str);
     // tokenize!
-    const tokens = unicode.match(reg)
+    const tokens = unicode.match(reg);
+    // if there's nothing there return null
+    if (tokens.length <= 0) return null;
+    // else return what was requested
     if (opts.output === 'string') {
       // make the tokens array into a string and return
-      return tokens.join(opts.delim)
+      return tokens.join(opts.delim);
     } else {
       // return the tokens array
-      return tokens
+      return tokens;
     }
-  }
+  };
 
-  tokenizer.noConflict = function () {
-    root.tokenizer = previous
-    return tokenizer
-  }
+  tokenizer.noConflict = function() {
+    global.tokenizer = previous;
+    return tokenizer;
+  };
 
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
-      exports = module.exports = tokenizer
+      exports = module.exports = tokenizer;
     }
-    exports.tokenizer = tokenizer
+    exports.tokenizer = tokenizer;
   } else {
-    root.tokenizer = tokenizer
+    global.tokenizer = tokenizer;
   }
-}).call(this)
+}).call(this);
