@@ -1,6 +1,6 @@
 /**
  * HappyNodeTokenizer
- * v0.2.0
+ * v0.2.1
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -27,9 +27,9 @@
  * const tokens = hnt(text, opts);
  * console.log(tokens)
  *
- * @param {string} str  input string to tokenize
- * @param {Object} opts  options
- * @return {(Array|string)}  return array or string depending on opts.output
+ * @param {string} str    string to tokenize
+ * @param {Object} opts   options object
+ * @return {(Array|string)}   array of tokens or deliminated string
  */
 
 'use strict'
@@ -45,9 +45,18 @@
     } else throw new Error('happynodetokenizer requires "he" module.');
   }
 
+  /**
+   * @function tokenizer
+   * @param  {string} str  string to tokenize
+   * @param  {Object} opts options object
+   * @return {(Array|string)} array of tokens or deliminated string
+   */
   const tokenizer = (str, opts) => {
     // if there is no string return null
-    if (!str) return null;
+    if (!str) {
+      console.error('HappyNodeTokenizer needs input! Returning null.');
+      return null;
+    }
     // ensure we're dealing with a string
     if (typeof str !== 'string') str = str.toString();
     // set default options if none are provided
@@ -68,7 +77,10 @@
     // tokenize!
     const tokens = unicode.match(reg);
     // if there's nothing there return null
-    if (tokens.length <= 0) return null;
+    if (tokens.length <= 0 || !tokens) {
+      console.warn('HappyNodeTokenizer: no tokens found. Returning null.');
+      return null;
+    }
     // else return what was requested
     if (opts.output === 'string') {
       // make the tokens array into a string and return
