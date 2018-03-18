@@ -1,6 +1,6 @@
 # HappyNodeTokenizer
 
-A basic, Twitter-aware tokenizer.
+A basic, Twitter aware tokenizer.
 
 Based on [HappierFunTokenizing.py - Copyright 2011, Christopher Potts](http://sentiment.christopherpotts.net/code-data/happyfuntokenizing.py).
 
@@ -36,6 +36,6 @@ The type of element to return: an array of tokens or a deliminated string.
 The delimiter for string outputs, can be any string.
 
 ## License
-(C) 2017-18 [P. Hughes](www.phugh.es). All rights reserved.
+(C) 2017-18 [P. Hughes](https://www.phugh.es). All rights reserved.
 
 Shared under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) license.

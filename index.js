@@ -1,6 +1,6 @@
 /**
  * HappyNodeTokenizer
- * v0.2.2
+ * v0.3.0
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -10,7 +10,7 @@
  * Based on HappierFunTokenizing.py - Copyright 2011, Christopher Potts
  * by: Christopher Potts, updated: H. Andrew Schwartz (www.wwbp.org)
  *
- * (C) 2017 P. Hughes
+ * (C) 2017-18 P. Hughes
  * Licence : Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  * http://creativecommons.org/licenses/by-nc-sa/3.0/
  *
@@ -34,16 +34,7 @@
 
 (function() {
   'use strict';
-  const global = this;
-  const previous = global.tokenizer;
-
-  let he = global.he;
-
-  if (typeof he === 'undefined') {
-    if (typeof require !== 'undefined') {
-      he = require('he');
-    } else throw new Error('happynodetokenizer requires "he" module.');
-  }
+  const he = require('he');
 
   /**
    * @function tokenizer
@@ -68,7 +59,7 @@
     }
     // if no output type is specified default to array
     opts.output = opts.output || 'array';
-    // if string output is chosen but no delimiter is given default to csv
+    // if string output is chosen but no delimiter is given default to comma
     opts.delim = opts.delim || ',';
     // define regex
     const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gi'); // eslint-disable-line
@@ -78,7 +69,7 @@
     const tokens = unicode.match(reg);
     // if there's nothing there return null
     if (tokens.length <= 0 || !tokens) {
-      if (opts.output === 'string') {
+      if (opts.output.match(/string/gi)) {
         console.warn('HappyNodeTokenizer: no tokens found. Returning empty string.');
         return '';
       } else {
@@ -87,18 +78,13 @@
       }
     }
     // else return what was requested
-    if (opts.output === 'string') {
+    if (opts.output.match(/string/gi)) {
       // make the tokens array into a string and return
       return tokens.join(opts.delim);
     } else {
       // return the tokens array
       return tokens;
     }
-  };
-
-  tokenizer.noConflict = function() {
-    global.tokenizer = previous;
-    return tokenizer;
   };
 
   if (typeof exports !== 'undefined') {
@@ -109,4 +95,4 @@
   } else {
     global.tokenizer = tokenizer;
   }
-}).call(this);
+})();
