@@ -16,10 +16,15 @@ const tokens = hnt(text, opts);
 console.log(tokens)
 ```
 
-If no tokens are found, happynodetokenizer will return null.
+If no tokens are found, happynodetokenizer will return either an empty array or an empty string, depending on opts.output.
 
 ## The Options Object
-The options object is optional.
+The options object is optional, the defaults are:
+
+```javascript
+  'output': 'array',
+  'delim': ','
+```
 
 ### 'output'
 **String - valid options: 'array' (default), or 'string'**
@@ -30,7 +35,7 @@ The type of element to return: an array of tokens or a deliminated string.
 **String - ',' (default)**
 The delimiter for string outputs, can be any string.
 
-## Licence
-(C) 2017 [P. Hughes](www.phugh.es)
+## License
+(C) 2017-18 [P. Hughes](www.phugh.es). All rights reserved.
 
-[Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/).
+Shared under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) license.

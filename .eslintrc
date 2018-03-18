@@ -1,16 +1,19 @@
 {
-  "extends": "google",
+  "extends": ["eslint:recommended", "google"],
   "parserOptions": {
       "ecmaVersion": 6
   },
   "env": {
     "node": true,
-    "es6": true
+    "es6": true,
+    "browser": false
   },
   "globals": {},
   "rules": {
     "no-trailing-spaces": 0,
     "semi": [2, "always"],
-    "no-eq-null": 2
+    "no-eq-null": 2,
+    "no-var": 0,
+    "no-console": 0
   }
 }

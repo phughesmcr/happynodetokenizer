@@ -1,6 +1,6 @@
 /**
  * HappyNodeTokenizer
- * v0.2.1
+ * v0.2.2
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -32,8 +32,8 @@
  * @return {(Array|string)}   array of tokens or deliminated string
  */
 
-'use strict'
-;(function() {
+(function() {
+  'use strict';
   const global = this;
   const previous = global.tokenizer;
 
@@ -71,15 +71,20 @@
     // if string output is chosen but no delimiter is given default to csv
     opts.delim = opts.delim || ',';
     // define regex
-    const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gi');
+    const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gi'); // eslint-disable-line
     // fix HTML elements
     const unicode = he.decode(str);
     // tokenize!
     const tokens = unicode.match(reg);
     // if there's nothing there return null
     if (tokens.length <= 0 || !tokens) {
-      console.warn('HappyNodeTokenizer: no tokens found. Returning null.');
-      return null;
+      if (opts.output === 'string') {
+        console.warn('HappyNodeTokenizer: no tokens found. Returning empty string.');
+        return '';
+      } else {
+        console.warn('HappyNodeTokenizer: no tokens found. Returning empty array.');
+        return [];
+      }
     }
     // else return what was requested
     if (opts.output === 'string') {
