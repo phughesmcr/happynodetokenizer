@@ -1,6 +1,6 @@
 /**
  * HappyNodeTokenizer
- * v0.3.0
+ * v0.4.0
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -18,13 +18,25 @@
  *  {
  *    "output": "array",  // output tokens as an "array" (default) or "string"
  *    "delim": ","        // delimiter for string outputs (default = ",")
+ *    "escape": true      // when outputting to a string, escape commas and
+ *                        //  quote marks with double-quotes, e.g.
+ *                        //  '"hello, you" he said' becomes:
+ *                        //  '",hello,,,you,",he,said' when escape = false, or
+ *                        //  '""",hello,",",you,""",he,said' when true
+ *                        // 0 = don't escape anything
+ *                        // 1 = escape the delimiter only
+ *                        // 2 = escape the delimiter, quotes and commas
+ *    "logs": 3,          // 0 = suppress all logs
+ *                        // 1 = print errors only
+ *                        // 2 = print errors and warnings
+ *                        // 3 = print all console logs
  *  }
  *
  * Usage example:
- * const hnt = require("happynodetokenizer");
+ * const tokenizer = require("happynodetokenizer");
  * const text = "A big long string of text...";
- * const opts = {"output": "array", "delim": ","}
- * const tokens = hnt(text, opts);
+ * const opts = {"output": "array", "delim": ",", "logs": 3}
+ * const tokens = tokenizer(text, opts);
  * console.log(tokens)
  *
  * @param {string} str    string to tokenize
@@ -42,38 +54,48 @@
    * @param  {Object} opts options object
    * @return {(Array|string)} array of tokens or deliminated string
    */
-  const tokenizer = (str, opts) => {
+  const tokenizer = (str, opts = {}) => {
+    // default options
+    opts.output = (typeof opts.output !== 'undefined') ? opts.output : 'array';
+    opts.delim = (typeof opts.delim !== 'undefined') ? opts.delim : ',';
+    opts.escape = (typeof opts.escape !== 'undefined') ? opts.escape : 2;
+    opts.logs = (typeof opts.logs !== 'undefined') ? opts.logs : 3;
     // if there is no string return null
     if (!str) {
-      console.error('HappyNodeTokenizer needs input! Returning null.');
-      return null;
+      if (opts.output.match(/string/gi)) {
+        if (opts.logs > 0) console.error('HappyNodeTokenizer: no input! Returning empty string.');
+        return '';
+      } else {
+        if (opts.logs > 0) console.error('HappyNodeTokenizer: no input! Returning empty array.');
+        return [];
+      }
     }
     // ensure we're dealing with a string
     if (typeof str !== 'string') str = str.toString();
-    // set default options if none are provided
-    if (!opts) {
-      opts = {
-        'output': 'array',
-        'delim': ',',
-      };
-    }
-    // if no output type is specified default to array
-    opts.output = opts.output || 'array';
-    // if string output is chosen but no delimiter is given default to comma
-    opts.delim = opts.delim || ',';
-    // define regex
-    const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gi'); // eslint-disable-line
+    // main tokenizer regex
+    const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX\/\:\}\{@\|\\]|[\)\]\(\[dDpPxX\/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<3|\(?\(?\#?\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg))|(?:http[s]?\:\/\/)|(?:\[[a-z_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|<[^>]+>|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[a-z][a-z'\-_]+[a-z])|(?:[+\-]?\d+[,\/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gmi'); // eslint-disable-line
     // fix HTML elements
-    const unicode = he.decode(str);
+    let tokens = he.decode(str);
     // tokenize!
-    const tokens = unicode.match(reg);
-    // if there's nothing there return null
-    if (tokens.length <= 0 || !tokens) {
+    tokens = tokens.match(reg);
+    // handle double-quote escapes if selected
+    if (opts.escape > 0 && opts.output.match(/string/gi)) {
+      let l = tokens.length;
+      let i;
+      for (i = 0; i < l; i++) {
+        let token = tokens[i];
+        token = token.replace(opts.delim, `"${opts.delim}"`);
+        if (opts.escape > 1) token = token.replace(/"/gm, '"""').replace(/,/gm, '","');
+        tokens[i] = token; 
+      }
+    }
+    // if there's nothing there return empty string or array
+    if (!tokens) {
       if (opts.output.match(/string/gi)) {
-        console.warn('HappyNodeTokenizer: no tokens found. Returning empty string.');
+        if (opts.logs > 1) console.warn('HappyNodeTokenizer: no tokens found. Returning empty string.');
         return '';
       } else {
-        console.warn('HappyNodeTokenizer: no tokens found. Returning empty array.');
+        if (opts.logs > 1) console.warn('HappyNodeTokenizer: no tokens found. Returning empty array.');
         return [];
       }
     }
