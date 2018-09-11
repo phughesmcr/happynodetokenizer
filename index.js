@@ -1,6 +1,6 @@
 /**
  * HappyNodeTokenizer
- * v0.4.0
+ * v0.4.1
  *
  * A basic, Twitter-aware tokenizer.
  *
@@ -18,7 +18,7 @@
  *  {
  *    "output": "array",  // output tokens as an "array" (default) or "string"
  *    "delim": ","        // delimiter for string outputs (default = ",")
- *    "escape": true      // when outputting to a string, escape commas and
+ *    "escape": 2         // when outputting to a string, escape commas and
  *                        //  quote marks with double-quotes, e.g.
  *                        //  '"hello, you" he said' becomes:
  *                        //  '",hello,,,you,",he,said' when escape = false, or
@@ -35,13 +35,13 @@
  * Usage example:
  * const tokenizer = require("happynodetokenizer");
  * const text = "A big long string of text...";
- * const opts = {"output": "array", "delim": ",", "logs": 3}
+ * const opts = {"output": "array", "delim": ",", "escape": 2, "logs": 3}
  * const tokens = tokenizer(text, opts);
  * console.log(tokens)
  *
  * @param {string} str    string to tokenize
- * @param {Object} opts   options object
- * @return {(Array|string)}   array of tokens or deliminated string
+ * @param {Object} [opts]   options object
+ * @return {(Array|string)}   array of tokens or delimited string
  */
 
 (function() {
@@ -51,15 +51,15 @@
   /**
    * @function tokenizer
    * @param  {string} str  string to tokenize
-   * @param  {Object} opts options object
-   * @return {(Array|string)} array of tokens or deliminated string
+   * @param  {Object} [opts] options object
+   * @return {(Array|string)} array of tokens or delimited string
    */
   const tokenizer = (str, opts = {}) => {
     // default options
-    opts.output = (typeof opts.output !== 'undefined') ? opts.output : 'array';
-    opts.delim = (typeof opts.delim !== 'undefined') ? opts.delim : ',';
-    opts.escape = (typeof opts.escape !== 'undefined') ? opts.escape : 2;
-    opts.logs = (typeof opts.logs !== 'undefined') ? opts.logs : 3;
+    opts.output = (typeof opts.output === 'undefined') ? 'array' : opts.output;
+    opts.delim = (typeof opts.delim === 'undefined') ? ',' : opts.delim;
+    opts.escape = (typeof opts.escape === 'undefined') ? 2 : opts.escape;
+    opts.logs = (typeof opts.logs === 'undefined') ? 3 : opts.logs;
     // if there is no string return null
     if (!str) {
       if (opts.output.match(/string/gi)) {
@@ -78,17 +78,6 @@
     let tokens = he.decode(str);
     // tokenize!
     tokens = tokens.match(reg);
-    // handle double-quote escapes if selected
-    if (opts.escape > 0 && opts.output.match(/string/gi)) {
-      let l = tokens.length;
-      let i;
-      for (i = 0; i < l; i++) {
-        let token = tokens[i];
-        token = token.replace(opts.delim, `"${opts.delim}"`);
-        if (opts.escape > 1) token = token.replace(/"/gm, '"""').replace(/,/gm, '","');
-        tokens[i] = token; 
-      }
-    }
     // if there's nothing there return empty string or array
     if (!tokens) {
       if (opts.output.match(/string/gi)) {
@@ -97,6 +86,17 @@
       } else {
         if (opts.logs > 1) console.warn('HappyNodeTokenizer: no tokens found. Returning empty array.');
         return [];
+      }
+    }
+    // handle double-quote escapes if selected
+    if (opts.escape > 0 && opts.output.match(/string/gi)) {
+      let l = tokens.length;
+      let i = 0;
+      for (i = 0; i < l; i++) {
+        let token = tokens[i];
+        token = token.replace(opts.delim, `"${opts.delim}"`);
+        if (opts.escape > 1) token = token.replace(/"/gm, '"""').replace(/,/gm, '","');
+        tokens[i] = token;
       }
     }
     // else return what was requested

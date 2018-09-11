@@ -1,6 +1,6 @@
 # HappyNodeTokenizer
 
-A basic, Twitter aware tokenizer.
+A basic Twitter aware tokenizer.
 
 Based on [HappierFunTokenizing.py - Copyright 2011, Christopher Potts](http://sentiment.christopherpotts.net/code-data/happyfuntokenizing.py).
 
