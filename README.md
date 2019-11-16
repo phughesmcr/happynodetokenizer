@@ -4,6 +4,11 @@ A basic Twitter aware tokenizer.
 
 Based on [HappierFunTokenizing.py](https://github.com/dlatk/happierfuntokenizing) by Christopher Potts and H. Andrew Schwartz.
 
+## Install
+```bash
+  npm install --save happynodetokenizer
+```
+
 ## Usage
 HappyNodeTokenizer exports an asynchronous function called `tokenize` and a synchronous function called `tokenizeSync`. `tokenizeSync` can also take a callback function as its third argument.
 
