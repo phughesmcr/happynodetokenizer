@@ -1,6 +1,6 @@
 {
   "name": "happynodetokenizer",
-  "version": "0.4.1",
+  "version": "1.0.0",
   "description": "A simple, Twitter-aware tokenizer.",
   "main": "index.js",
   "keywords": [
@@ -19,12 +19,16 @@
   ],
   "author": "P. Hughes <peter@phugh.es> (http://www.phugh.es)",
   "license": "CC-BY-NC-SA-3.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "dependencies": {
-    "he": "^1.1.1"
+    "he": "^1.2.0"
   },
   "homepage": "https://github.com/phugh/happynodetokenizer",
   "repository": {
     "type": "git",
     "url": "https://github.com/phugh/happynodetokenizer"
-  }
+  },
+  "devDependencies": {}
 }
