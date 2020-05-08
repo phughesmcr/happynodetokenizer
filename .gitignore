@@ -3,7 +3,6 @@ node_modules/
 .vscode/
 .npm
 .env
-test.js
 
 ### Ignore OS X Files
 *.DS_Store
