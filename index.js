@@ -1,148 +1,258 @@
 /**
  * @preserve
  * HappyNodeTokenizer
- * v1.0.0
+ * v2.0.0
  *
- * A basic, Twitter-aware tokenizer.
+ * A basic Twitter-aware tokenizer.
  *
  * Help me make this better:
  * https://github.com/phugh/happynodetokenizer
  *
- * Based on HappierFunTokenizing.py - Copyright 2011, Christopher Potts
- * by: Christopher Potts, updated: H. Andrew Schwartz (www.wwbp.org)
+ * Based on:
+ * HappyFunTokenizer.py by Christopher Potts (C) 2011
+ * and
+ * HappierFunTokenizing.py by H. Andrew Schwartz (www.wwbp.org)
  *
- * (C) 2017-19 P. Hughes
- * Licence : Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
+ * (C) 2017-20 P. Hughes. All rights reserved.
+ * License : Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
  * http://creativecommons.org/licenses/by-nc-sa/3.0/
  *
  * @name         HappyNodeTokenizer
  * @file         index.js
- * @description  A basic, Twitter-aware tokenizer.
- * @version      1.0.0
+ * @description  A basic Twitter-aware tokenizer.
+ * @version      2.0.0
  * @exports      (tokenize|tokenizeSync)
  * @requires     he
  * @author       P. Hughes <peter@phugh.es> (https://www.phugh.es)
- * @copyright    2017-19 P. Hughes. All rights reserved.
+ * @copyright    2017-20 P. Hughes. All rights reserved.
  * @license      CC-BY-NC-SA-3.0
  *
  * Default options (opts):
  *  {
- *    "output": "array",  // output tokens as an "array" (default) or "string"
- *    "delim": ","        // delimiter for string outputs (default = ",")
- *    "escape": 0         // when outputting to a string, escape commas and
- *                        //  quote marks with double-quotes, e.g.
- *                        //  '"hello, you" he said' becomes:
- *                        //  '",hello,,,you,",he,said' when escape = false, or
- *                        //  '""",hello,",",you,""",he,said' when true
- *                        // 0 = don't escape anything (default)
- *                        // 1 = escape the delimiter only
- *                        // 2 = escape the delimiter, quotes and commas
- *    "logs": 2,          // 0 = suppress all logs
- *                        // 1 = print errors only
- *                        // 2 = print errors and warnings (default)
- *                        // 3 = print all console logs
- *    "strict": false     // true = functions throw errors
- *                        // false = functions return gracefully on errors
- *    "normalize": true   // Replace unicode characters (accents etc.)
- *                        // true = replace input with the Unicode Normalization Form of the string (default)
- *                        // false = do not normalize strings - N.B. may cause problems with accented characters etc.
+ *    "logs": 2,            // 0 = suppress all logs
+ *                          // 1 = print errors only
+ *                          // 2 = print errors and warnings
+ *                          // 3 = print all console logs
+ *
+ *    "mode": "stanford"    // Switch between variations of implementation of HappierFunTokenizing.py
+ *                          // "stanford" = https://github.com/stanfordnlp/python-stanford-corenlp/blob/master/tests/happyfuntokenizer.py
+ *                          // "dlatk"    = https://github.com/dlatk/happierfuntokenizing/blob/master/happierfuntokenizing.py
+ *
+ *    "normalize": false    // Replace unicode characters (accents etc.)
+ *                          // true   = replace input with the Unicode Normalization Form of the string
+ *                          // false  = do not normalize strings - N.B. may cause problems with accented characters etc.
+ *
+ *    "preserveCase": false // Preserves the case of the input string. Does not affect emoticons.
+ *                          // true   = preserve case
+ *                          // false  = tokens are returned in lower case
+ *
+ *    "strict": false       // Strict mode will throw errors a lot - useful for debugging
+ *                          // true   = enable strict mode
+ *                          // false  = disable strict mode
  *  }
  *
  * @example
  *  const tokenizer = require("happynodetokenizer");
  *  const text = "A big long string of text...";
- *  const opts = {"output": "array", "escape": 0, "logs": 2}
+ *  const opts = {"logs": 2, "normalize": false, "preserveCase": false, "strict": false};
  *  const tokens = tokenizer(text, opts);
- *  console.log(tokens)
+ *  console.log(tokens); // ["a", "big", "long", "string", "of", "text", "..."]
  */
-
 (() => {
   'use strict';
   const he = require('he');
 
+  /* REGEX PATTERNS */
+
+  // accentedChars:
+  // Javascript doesn't match accented characters like Python
+  // so this additional code has been inserted into both
+  // the Stanford and DLATK regexps, in the "Remaining" item:
+  // accentedChars = \u00C0-\u00FF
+
+  // Stanford
+  const _stanfordPhoneNumbers = new RegExp(/(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/);
+  const _stanfordEmoticons = new RegExp(/(?:[<>]?[:;=8][-o*']?[)\]([dDpP/:}{@|\\]|[)\]([dDpP/:}{@|\\][-o*']?[:;=8][<>]?)/);
+  const _stanfordHtmlTags = new RegExp(/<[^>]+>/);
+  const _stanfordTwitterUsernames = new RegExp(/(?:@[\w_]+)/);
+  const _stanfordHashtags = new RegExp(/(?:#+[\w_]+[\w'_-]*[\w_]+)/);
+  const _stanfordRemaining = new RegExp(/(?:[a-z\u00C0-\u00FF][a-z\u00C0-\u00FF'\-_]+[a-z\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/);  // see "accentedChars" above
+  const stanfordTokenizerPattern = new RegExp(
+      _stanfordPhoneNumbers.source + '|' +
+      _stanfordEmoticons.source + '|' +
+      _stanfordHtmlTags.source + '|' +
+      _stanfordTwitterUsernames.source + '|' +
+      _stanfordHashtags.source + '|' +
+      _stanfordRemaining.source,
+      'gi');
+
+  // DLATK
+  const _dlatkPhoneNumbers = new RegExp(/(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/);
+  const _dlatkEmoticons = new RegExp(/(?:[<>]?[:;=8>][-o*']?[)\]([dDpPxX/:}{@|\\]|[)\]([dDpPxX/:}{@|\\][-o*']?[:;=8<][<>]?|<[/\\]?3|\(?\(?#?[>\-^*+o~][_.|oO,][<\-^*+o~][#;]?\)?\)?)/);
+  const _dlatkWebAddressFull = new RegExp(/(?:(?:http[s]?:\/\/)?(?:[\w_-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg)(?:\/[\s\b$])?)/);
+  const _dlatkWebStart = new RegExp(/(?:http[s]?:\/\/)/);
+  const _dlatkCommand = new RegExp(/(?:\[[\w_]+\])/);
+  const _dlatkHttpGet = new RegExp(/(?:\/\w+\?(?:;?\w+=\w+)+)/);
+  const _dlatkHtmlTags = new RegExp(/(?:<[^>]+\w=[^>]+>|<[^>]+\s\/>|<[^>\s]+>?|<?[^<\s]+>)/);
+  const _dlatkTwitterUsernames = new RegExp(/(?:@[\w_]+)/);
+  const _dlatkHashtags = new RegExp(/(?:#+[\w_]+[\w'_-]*[\w_]+)/);
+  const _dlatkRemaining = new RegExp(/(?:[\w\u00C0-\u00FF][\w\u00C0-\u00FF'\-_]+[\w\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/); // see "_accentedChars" above
+  const dlatkTokenizerPattern = new RegExp(
+      _dlatkPhoneNumbers.source + '|' +
+      _dlatkEmoticons.source + '|' +
+      _dlatkWebAddressFull.source + '|' +
+      _dlatkWebStart.source + '|' +
+      _dlatkCommand.source + '|' +
+      _dlatkHttpGet.source + '|' +
+      _dlatkHtmlTags.source + '|' +
+      _dlatkTwitterUsernames.source + '|' +
+      _dlatkHashtags.source + '|' +
+      _dlatkRemaining.source,
+      'gi');
+
+  /**
+   * Default tokenizer options
+   * @type {Object} opts options object
+   * @private
+   */
+  const _defaultOptions = {
+    logs: 2,
+    mode: 'stanford',
+    normalize: false,
+    preserveCase: false,
+    strict: false,
+  };
+
   /**
    * @function _validateOpts
    * @private
-   * @param  {Object} opts options object
+   * @param {Object} opts options object
    * @return {Object} validated options
    */
   const _validateOpts = (opts) => {
-    if (!opts || opts === null) {
-      return {
-        delim: ',',
-        escape: 0,
-        logs: 2,
-        normalize: true,
-        output: 'array',
-        strict: false,
-      };
-    }
-    // deliminator
-    opts.delim = (typeof opts.delim === 'undefined') ? ',' : opts.delim;
-    opts.delim = (typeof opts.delim !== 'string') ? ',' : opts.delim;
-    // escape
-    opts.escape = (typeof opts.escape === 'undefined') ? 0 : opts.escape;
-    opts.escape = (typeof opts.escape !== 'number') ? 0 : opts.escape;
-    // logs
-    opts.logs = (typeof opts.logs === 'undefined') ? 2 : opts.logs;
-    opts.logs = (typeof opts.logs !== 'number') ? 2 : opts.logs;
-    // normalize
-    opts.normalize = (typeof opts.normalize === 'undefined') ? true : opts.normalize;
-    opts.normalize = (typeof opts.normalize !== 'boolean') ? true : opts.normalize;
-    // output
-    opts.output = (typeof opts.output === 'undefined') ? 'array' : opts.output;
-    opts.output = (typeof opts.output !== 'string') ? 'array' : opts.output;
-    opts.output = (opts.output.match(/str/gi)) ? 'string' : 'array';
-    // strict
-    opts.strict = (typeof opts.strict === 'undefined') ? false : opts.strict;
-    opts.strict = (typeof opts.strict !== 'boolean') ? false : opts.strict;
+    opts = Object.assign({}, _defaultOptions, opts);
+    opts.logs = (
+      typeof opts.logs === 'undefined' ||
+      typeof opts.logs !== 'number'
+    ) ? 2 : opts.logs;
+    opts.mode = (
+      typeof opts.mode === 'undefined' ||
+      typeof opts.mode !== 'string'
+    ) ? 'stanford' : opts.mode.toLowerCase();
+    opts.normalize = (
+      typeof opts.normalize === 'undefined' ||
+      typeof opts.normalize !== 'boolean'
+    ) ? false : opts.normalize;
+    opts.preserveCase = (
+      typeof opts.preserveCase === 'undefined' ||
+      typeof opts.preserveCase !== 'boolean'
+    ) ? false : opts.preserveCase;
+    opts.strict = (
+      typeof opts.strict === 'undefined' ||
+      typeof opts.strict !== 'boolean'
+    ) ? false : opts.strict;
     return opts;
   };
 
   /**
-   * @function tokenizer
-   * @public
-   * @async
-   * @param  {string} str  string to tokenize
-   * @param  {Object} [opts] options object
-   * @return {Promise} array of tokens or delimited string
+   * Remove hex codes from string
+   * @function _removeHex
+   * @private
+   * @param {string} str
+   * @return {string}
    */
-  const tokenizer = async (str, opts) => {
-    return tokenizerSync(str, opts, (err, data) => {
-      if (err) throw new Error(err);
-      return data;
-    });
+  const _removeHex = (str) => {
+    return str.replace(/\\x[0-9a-z]{1,4}/g, '');
   };
 
   /**
-   * @function tokenizerSync
+   * Replace html entities with unicode string
+   * @function _html2unicode
+   * @private
+   * @param {string} str input string
+   * @param {number} [logs=2] logging level
+   * @return {string}
+   */
+  const _html2unicode = (str, logs = 2) => {
+    const digits = /&#\d+;/;
+    const alpha = /&\w+;/;
+
+    str = str.replace('&amp;', ' and ');
+
+    const digitMatches = str.match(digits);
+    if (digitMatches && digitMatches.length > 0) {
+      digitMatches.forEach((token) => {
+        try {
+          const sub = token.substring(2);
+          const code = parseInt(sub, 10);
+          str = str.replace(token, String.fromCharCode(code));
+        } catch (err) {
+          if (logs > 1) {
+            console.warn(`HappyNodeTokenizer: Couldn't replace "${token}".`);
+          }
+        }
+      });
+    }
+
+    const alphaMatches = str.match(alpha);
+    if (alphaMatches && alphaMatches.length > 0) {
+      alphaMatches.forEach((token) => {
+        try {
+          str = str.replace(token, he.decode(token));
+        } catch (err) {
+          if (logs > 1) {
+            console.warn(`HappyNodeTokenizer: Couldn't replace "${token}".`);
+          }
+        }
+      });
+    }
+
+    return str;
+  };
+
+  /**
    * @public
-   * @param {string}   str    string to tokenize
-   * @param {Object}   [opts] options object
-   * @param {function} [cb]   callback function
-   * @return {(Array|string)} array of tokens or delimited string
+   * @async
+   * @function tokenizer
+   * @param {string} str string to tokenize
+   * @param {Object} [opts] options object
+   * @param {number} [opts.logs=2] logging level
+   * @param {"stanford" | "dlatk"} [opts.mode="stanford"] matching pattern
+   * @param {boolean} [opts.normalize=false] normalize strings
+   * @param {boolean} [opts.preserveCase=false] preserve input case
+   * @param {boolean} [opts.strict=false] throw errors
+   * @return {Promise<string[]>} array of tokens or delimited string
+   */
+  const tokenizer = async (str, opts) => {
+    return tokenizerSync(str, opts);
+  };
+
+  /**
+   * @public
+   * @function tokenizerSync
+   * @param {string} str string to tokenize
+   * @param {Object} [opts] options object
+   * @param {number} [opts.logs=2] logging level
+   * @param {"stanford" | "dlatk"} [opts.mode="stanford"] matching pattern
+   * @param {boolean} [opts.normalize=false] normalize strings
+   * @param {boolean} [opts.preserveCase=false] preserve input case
+   * @param {boolean} [opts.strict=false] throw errors
+   * @param {function} [cb] callback function
+   * @return {string[]} array of tokens or delimited string
    */
   const tokenizerSync = (str, opts, cb) => {
     // manage options
     opts = _validateOpts(opts);
     // handle invalid input
-    if (!str) {
+    if (!str || typeof str !== 'string') {
       if (opts.strict) {
         if (cb && typeof cb === 'function') {
-          return cb('HappyNodeTokenizer: no input.');
+          return cb('HappyNodeTokenizer: no valid input found.', undefined);
         } else {
-          throw new Error('HappyNodeTokenizer: no input.');
-        }
-      }
-      if (opts.output === 'string') {
-        if (opts.logs > 1) console.warn('HappyNodeTokenizer: no input! Returning empty string.');
-        if (cb && typeof cb === 'function') {
-          return cb(null, '');
-        } else {
-          return '';
+          throw new Error('HappyNodeTokenizer: no valid input found.');
         }
       } else {
-        if (opts.logs > 1) console.warn('HappyNodeTokenizer: no input! Returning empty array.');
+        if (opts.logs > 1) console.warn('HappyNodeTokenizer: no valid input found. Returning empty array.');
         if (cb && typeof cb === 'function') {
           return cb(null, []);
         } else {
@@ -150,17 +260,19 @@
         }
       }
     }
-    // ensure we're dealing with a string
-    if (typeof str !== 'string') str = str.toString();
-    // main tokenizer RegExp
-    const reg = new RegExp(/(?:(?:\+?[01][\-\s.]*)?(?:[\(]?\d{3}[\-\s.\)]*)?\d{3}[\-\s.]*\d{4})|(?:[<>]?[:;=8>][\-o\*\']?[\)\]\(\[dDpPxX/\:\}\{@\|\\]|[\)\]\(\[dDpPxX/\:\}\{@\|\\][\-o\*\']?[:;=8<][<>]?|<[/\\]?3|\(?\(?\#?[>\-\^\*\+o\~][\_\.\|oO\,][<\-\^\*\+o\~][\#\;]?\)?\)?)|(?:(?:http[s]?\:\/\/)?(?:[\w\_\-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg)(?:\/[\s\b$])?)|(?:http[s]?\:\/\/)|(?:\[[\w_]+\])|(?:\/\w+\?(?:\;?\w+\=\w+)+)|(?:<[^>]+\w=[^>]+>|<[^>]+\s\/>|<[^>\s]+>?|<?[^<\s]+>)|(?:@[\w_]+)|(?:\#+[\w_]+[\w\'_\-]*[\w_]+)|(?:[\w][\w'\-_]+[\w])|(?:[+\-]?\d+[,/.:-]\d+[+\-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/, 'gmi'); // eslint-disable-line
     // fix HTML elements
-    let tokens = he.decode(str);
-    if (opts.normalize) tokens = tokens.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    let decoded = _html2unicode(str, opts.logs);
+    if (opts.mode === 'dlatk') decoded = _removeHex(decoded);
+    if (opts.normalize) decoded = decoded.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     // tokenize!
-    tokens = tokens.match(reg);
+    let tokens;
+    if (opts.mode === 'dlatk') {
+      tokens = decoded.match(dlatkTokenizerPattern);
+    } else {
+      tokens = decoded.match(stanfordTokenizerPattern);
+    }
     // if there's nothing there, return empty string or array
-    if (!tokens) {
+    if (!tokens || tokens.length === 0) {
       if (opts.strict) {
         if (cb && typeof cb === 'function') {
           return cb('HappyNodeTokenizer: no tokens found.');
@@ -168,49 +280,30 @@
           throw new Error('HappyNodeTokenizer: no tokens found.');
         }
       } else {
-        if (opts.output === 'string') {
-          if (opts.logs > 1) console.warn('HappyNodeTokenizer: no tokens found. Returning empty string.');
-          if (cb && typeof cb === 'function') {
-            return cb(null, '');
-          } else {
-            return '';
-          }
+        if (opts.logs > 1) console.warn('HappyNodeTokenizer: no tokens found. Returning empty array.');
+        if (cb && typeof cb === 'function') {
+          return cb(null, []);
         } else {
-          if (opts.logs > 1) console.warn('HappyNodeTokenizer: no tokens found. Returning empty array.');
-          if (cb && typeof cb === 'function') {
-            return cb(null, []);
-          } else {
-            return [];
-          }
+          return [];
         }
       }
     }
-    // handle double-quote escapes if selected
-    if (opts.escape > 0 && opts.output === 'string') {
-      const l = tokens.length;
-      let i = 0;
-      for (i = 0; i < l; i++) {
-        let token = tokens[i];
-        token = token.replace(opts.delim, `"${opts.delim}"`);
-        if (opts.escape > 1) token = token.replace(/"/gm, '"""').replace(/,/gm, '","');
-        tokens[i] = token;
-      }
+    // handle preserveCase option
+    if (opts.preserveCase === false) {
+      const emoticons = (opts.mode === 'dlatk') ?  _dlatkEmoticons : _stanfordEmoticons;
+      tokens = tokens.map((token) => {
+        if (!emoticons.test(token)) {
+          return token.toLowerCase();
+        } else {
+          return token;
+        }
+      });
     }
-    // else return what was requested
-    if (opts.output === 'string') {
-      // make the tokens array into a string and return
-      if (cb && typeof cb === 'function') {
-        return cb(null, tokens.join(opts.delim));
-      } else {
-        return tokens.join(opts.delim);
-      }
+    // return the tokens array
+    if (cb && typeof cb === 'function') {
+      return cb(null, tokens);
     } else {
-      // return the tokens array
-      if (cb && typeof cb === 'function') {
-        return cb(null, tokens);
-      } else {
-        return tokens;
-      }
+      return tokens;
     }
   };
   // export!
@@ -222,15 +315,11 @@
         tokenise: tokenizer,
         tokeniseSync: tokenizerSync,
       };
+    } else {
+      exports.tokenize = tokenizer;
+      exports.tokenizeSync = tokenizerSync;
+      exports.tokenise = tokenizer;
+      exports.tokeniseSync = tokenizerSync;
     }
-    exports.tokenize = tokenizer;
-    exports.tokenizeSync = tokenizerSync;
-    exports.tokenise = tokenizer;
-    exports.tokeniseSync = tokenizerSync;
-  } else {
-    global.tokenize = tokenizer;
-    global.tokenizeSync = tokenizerSync;
-    global.tokenise = tokenizer;
-    global.tokeniseSync = tokenizerSync;
   }
 })();
