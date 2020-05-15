@@ -20,7 +20,11 @@
     "text",
     "strings"
   ],
-  "author": "P. Hughes <peter@phugh.es> (http://www.phugh.es)",
+  "author": {
+    "name": "Peter Hughes",
+    "email": "peter@phugh.es",
+    "url": "https://www.phugh.es"
+  },
   "license": "CC-BY-NC-SA-3.0",
   "engines": {
     "node": ">=8.10.0"
