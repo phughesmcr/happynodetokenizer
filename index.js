@@ -240,11 +240,11 @@
       } else if (_dlatkWebAddressFull.test(token)) {
         return 'url';
       } else if (_dlatkWebStart.test(token)) {
-        return 'webprotocol';
+        return 'url_scheme';
       } else if (_dlatkCommand.test(token)) {
-        return 'webcommand';
+        return 'url_command';
       } else if (_dlatkHttpGet.test(token)) {
-        return 'httpget';
+        return 'url_path_query';
       } else if (_dlatkHtmlTags.test(token) && (!_dlatkEmoticons.test(token) || (_dlatkEmoticons.test(token) && /[a-zA-Z]{2,}/g.test(token)))) {
         return 'htmltag';
       } else if (_dlatkEmoticons.test(token)) {
