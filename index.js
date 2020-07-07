@@ -49,12 +49,23 @@
  *    "strict": false       // Strict mode will throw errors a lot - useful for debugging
  *                          // true   = enable strict mode
  *                          // false  = disable strict mode
+ *
+ *    "tag": false          // Return an array of token objects instead of just an array of tokens
+ *                          // true   = return an array of token objects: [ {value: 'token', tag: 'word' }, ... ]
+ *                          // false  = return an array of tokens: [ 'token', 'another', 'word', ... ]
  *  }
  *
  * @example
  *  const tokenizer = require("happynodetokenizer");
  *  const text = "A big long string of text...";
- *  const opts = {"logs": 2, "normalize": false, "preserveCase": false, "strict": false};
+ *  const opts = {
+ *      "logs": 2,
+ *      "mode": "stanford",
+ *      "normalize": false,
+ *      "preserveCase": false,
+ *      "strict": false,
+ *      "tag": false,
+ *  };
  *  const tokens = tokenizer(text, opts);
  *  console.log(tokens); // ["a", "big", "long", "string", "of", "text", "..."]
  */
@@ -123,6 +134,7 @@
     normalize: false,
     preserveCase: false,
     strict: false,
+    tag: false,
   };
 
   /**
@@ -130,11 +142,12 @@
    * @private
    * @param {object} [opts] options object
    * @param {number} [opts.logs=2] logging level
-   * @param {"stanford" | "dlatk"} [opts.mode="stanford"] matching pattern
+   * @param {string} [opts.mode="stanford"] matching pattern
    * @param {boolean} [opts.normalize=false] normalize strings
    * @param {boolean} [opts.preserveCase=false] preserve input case
    * @param {boolean} [opts.strict=false] throw errors
-   * @return {{[key: string]: number | string | boolean}} validated options
+   * @param {boolean} [opts.tag=false] return token object with tag attribute
+   * @return {object} validated options
    */
   const _validateOpts = (opts) => {
     opts = Object.assign({}, _defaultOptions, opts);
@@ -158,6 +171,10 @@
       typeof opts.strict === 'undefined' ||
       typeof opts.strict !== 'boolean'
     ) ? false : opts.strict;
+    opts.tag = (
+      typeof opts.tag === 'undefined' ||
+      typeof opts.tag !== 'boolean'
+    ) ? false : opts.tag;
     return opts;
   };
 
@@ -218,6 +235,82 @@
   };
 
   /**
+   * @private
+   * @param {string} token
+   * @param {string} mode
+   * @return {string}
+   */
+  const _getTag = (token, mode) => {
+    if (mode === 'dlatk') {
+      if (_dlatkPhoneNumbers.test(token)) {
+        return 'phone';
+      } else if (_dlatkWebAddressFull.test(token)) {
+        return 'url';
+      } else if (_dlatkWebStart.test(token)) {
+        return 'webprotocol';
+      } else if (_dlatkCommand.test(token)) {
+        return 'webcommand';
+      } else if (_dlatkHttpGet.test(token)) {
+        return 'httpget';
+      } else if (_dlatkHtmlTags.test(token) && (!_dlatkEmoticons.test(token) || (_dlatkEmoticons.test(token) && /[a-zA-Z]{2,}/g.test(token)))) {
+        return 'htmltag';
+      } else if (_dlatkEmoticons.test(token)) {
+        return 'emoticon';
+      } else if (_dlatkTwitterUsernames.test(token)) {
+        return 'username';
+      } else if (_dlatkHashtags.test(token)) {
+        return 'hashtag';
+      } else if (_dlatkRemaining.test(token)) {
+        if (/\w/.test(token)) {
+          return 'word';
+        } else {
+          return 'punct';
+        }
+      } else {
+        return '<UNK>';
+      }
+    } else {
+      if (_stanfordPhoneNumbers.test(token)) {
+        return 'phone';
+      } else if (_stanfordHtmlTags.test(token) && (!_stanfordEmoticons.test(token) || (_stanfordEmoticons.test(token) && /[a-zA-Z]{2,}/g.test(token)))) {
+        return 'htmltag';
+      } else if (_stanfordEmoticons.test(token)) {
+        return 'emoticon';
+      } else if (_stanfordTwitterUsernames.test(token)) {
+        return 'username';
+      } else if (_stanfordHashtags.test(token)) {
+        return 'hashtag';
+      } else if (_stanfordRemaining.test(token)) {
+        if (/\w/.test(token)) {
+          return 'word';
+        } else {
+          return 'punct';
+        }
+      } else {
+        return '<UNK>';
+      }
+    }
+  };
+
+  /**
+   * @private
+   * @param {string[]} tokens
+   * @param {string} mode
+   * @return {object[]}
+   */
+  const _createTokenObject = (tokens, mode) => {
+    /** @type {Array<{[key: string]: string}>} */
+    const output = [];
+    tokens.forEach((token) => {
+      output.push({
+        value: token,
+        tag: _getTag(token, mode),
+      });
+    });
+    return output;
+  };
+
+  /**
    * @public
    * @async
    * @function tokenizer
@@ -228,7 +321,8 @@
    * @param {boolean} [opts.normalize=false] normalize strings
    * @param {boolean} [opts.preserveCase=false] preserve input case
    * @param {boolean} [opts.strict=false] throw errors
-   * @return {Promise<string[]>} array of tokens or delimited string
+   * @param {boolean} [opts.tag=false] return token object with tag attribute
+   * @return {Promise<string[] | object[]>} array of tokens or array of token objects
    */
   const tokenizer = async (str, opts) => {
     return tokenizerSync(str, opts);
@@ -244,8 +338,9 @@
    * @param {boolean} [opts.normalize=false] normalize strings
    * @param {boolean} [opts.preserveCase=false] preserve input case
    * @param {boolean} [opts.strict=false] throw errors
+   * @param {boolean} [opts.tag=false] return token object with tag attribute
    * @param {function} [cb] callback function
-   * @return {string[]} array of tokens or delimited string
+   * @return {string[] | object[]} array of tokens or array of token objects
    */
   const tokenizerSync = (str, opts, cb) => {
     // manage options
@@ -305,6 +400,9 @@
           return token;
         }
       });
+    }
+    if (opts.tag === true) {
+      tokens = _createTokenObject(tokens, opts.mode);
     }
     // return the tokens array
     if (cb && typeof cb === 'function') {
