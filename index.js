@@ -254,7 +254,7 @@
     if (!str || typeof str !== 'string') {
       if (opts.strict) {
         if (cb && typeof cb === 'function') {
-          return cb('HappyNodeTokenizer: no valid input found.', undefined);
+          return cb('HappyNodeTokenizer: no valid input found.', []);
         } else {
           throw new Error('HappyNodeTokenizer: no valid input found.');
         }
@@ -282,7 +282,7 @@
     if (!tokens || tokens.length === 0) {
       if (opts.strict) {
         if (cb && typeof cb === 'function') {
-          return cb('HappyNodeTokenizer: no tokens found.');
+          return cb('HappyNodeTokenizer: no tokens found.', []);
         } else {
           throw new Error('HappyNodeTokenizer: no tokens found.');
         }
