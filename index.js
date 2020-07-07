@@ -64,11 +64,13 @@
 
   /* REGEX PATTERNS */
 
-  // accentedChars:
-  // Javascript doesn't match accented characters like Python
-  // so this additional code has been inserted into both
-  // the Stanford and DLATK regexps, in the "Remaining" item:
-  // accentedChars = \u00C0-\u00FF
+  /**
+   * @see accentedChars:
+   * Javascript doesn't match accented characters like Python
+   * so this additional code has been inserted into both
+   * the Stanford and DLATK regexps, in the "Remaining" item:
+   * accentedChars = \u00C0-\u00FF
+   */
 
   // Stanford
   const _stanfordPhoneNumbers = new RegExp(/(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/);
@@ -112,7 +114,7 @@
 
   /**
    * Default tokenizer options
-   * @type {Object} opts options object
+   * @type {{[key: string]: number | string | boolean}} opts options object
    * @private
    */
   const _defaultOptions = {
@@ -126,8 +128,13 @@
   /**
    * @function _validateOpts
    * @private
-   * @param {Object} opts options object
-   * @return {Object} validated options
+   * @param {object} [opts] options object
+   * @param {number} [opts.logs=2] logging level
+   * @param {"stanford" | "dlatk"} [opts.mode="stanford"] matching pattern
+   * @param {boolean} [opts.normalize=false] normalize strings
+   * @param {boolean} [opts.preserveCase=false] preserve input case
+   * @param {boolean} [opts.strict=false] throw errors
+   * @return {{[key: string]: number | string | boolean}} validated options
    */
   const _validateOpts = (opts) => {
     opts = Object.assign({}, _defaultOptions, opts);
@@ -215,7 +222,7 @@
    * @async
    * @function tokenizer
    * @param {string} str string to tokenize
-   * @param {Object} [opts] options object
+   * @param {object} [opts] options object
    * @param {number} [opts.logs=2] logging level
    * @param {"stanford" | "dlatk"} [opts.mode="stanford"] matching pattern
    * @param {boolean} [opts.normalize=false] normalize strings
@@ -231,7 +238,7 @@
    * @public
    * @function tokenizerSync
    * @param {string} str string to tokenize
-   * @param {Object} [opts] options object
+   * @param {object} [opts] options object
    * @param {number} [opts.logs=2] logging level
    * @param {"stanford" | "dlatk"} [opts.mode="stanford"] matching pattern
    * @param {boolean} [opts.normalize=false] normalize strings
@@ -260,7 +267,7 @@
         }
       }
     }
-    // fix HTML elements
+    // handle special characters
     let decoded = _html2unicode(str, opts.logs);
     if (opts.mode === 'dlatk') decoded = _removeHex(decoded);
     if (opts.normalize) decoded = decoded.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -271,7 +278,7 @@
     } else {
       tokens = decoded.match(stanfordTokenizerPattern);
     }
-    // if there's nothing there, return empty string or array
+    // if there are no tokens, return an empty array
     if (!tokens || tokens.length === 0) {
       if (opts.strict) {
         if (cb && typeof cb === 'function') {
@@ -290,7 +297,7 @@
     }
     // handle preserveCase option
     if (opts.preserveCase === false) {
-      const emoticons = (opts.mode === 'dlatk') ?  _dlatkEmoticons : _stanfordEmoticons;
+      const emoticons = (opts.mode === 'dlatk') ? _dlatkEmoticons : _stanfordEmoticons;
       tokens = tokens.map((token) => {
         if (!emoticons.test(token)) {
           return token.toLowerCase();
