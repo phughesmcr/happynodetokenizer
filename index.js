@@ -315,8 +315,15 @@
    * @param {boolean} [opts.tag=false] return token object with tag attribute
    * @return {Promise<string[] | object[]>} array of tokens or array of token objects
    */
-  const tokenizer = async (str, opts) => {
-    return tokenizerSync(str, opts);
+  const tokenizer = (str, opts) => {
+    return new Promise((res, rej) => {
+      try {
+        const tokens = tokenizerSync(str, opts);
+        res(tokens);
+      } catch (err) {
+        rej(err);
+      }
+    });
   };
 
   /**
