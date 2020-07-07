@@ -185,9 +185,7 @@
    * @param {string} str
    * @return {string}
    */
-  const _removeHex = (str) => {
-    return str.replace(/\\x[0-9a-z]{1,4}/g, '');
-  };
+  const _removeHex = (str) => str.replace(/\\x[0-9a-z]{1,4}/g, '');
 
   /**
    * Replace html entities with unicode string
@@ -198,19 +196,14 @@
    * @return {string}
    */
   const _html2unicode = (str, logs = 2) => {
-    const digits = /&#\d+;/;
-    const alpha = /&\w+;/;
-
     str = str.replace('&amp;', ' and ');
 
-    const digitMatches = str.match(digits);
+    const digitMatches = str.match(/&#\d+;/);
     if (digitMatches && digitMatches.length > 0) {
       digitMatches.forEach((token) => {
         try {
-          const sub = token.substring(2);
-          const code = parseInt(sub, 10);
-          str = str.replace(token, String.fromCharCode(code));
-        } catch (err) {
+          str = str.replace(token, String.fromCharCode(parseInt(token.substring(2), 10)));
+        } catch (_err) {
           if (logs > 1) {
             console.warn(`HappyNodeTokenizer: Couldn't replace "${token}".`);
           }
@@ -218,7 +211,7 @@
       });
     }
 
-    const alphaMatches = str.match(alpha);
+    const alphaMatches = str.match(/&\w+;/);
     if (alphaMatches && alphaMatches.length > 0) {
       alphaMatches.forEach((token) => {
         try {
@@ -300,14 +293,12 @@
    */
   const _createTokenObject = (tokens, mode) => {
     /** @type {Array<{[key: string]: string}>} */
-    const output = [];
-    tokens.forEach((token) => {
-      output.push({
+    return tokens.map((token) => {
+      return {
         value: token,
         tag: _getTag(token, mode),
-      });
+      };
     });
-    return output;
   };
 
   /**
