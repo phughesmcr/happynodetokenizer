@@ -1,7 +1,7 @@
 /**
  * @preserve
  * HappyNodeTokenizer
- * v2.1.0
+ * v2.1.1
  *
  * A basic Twitter-aware tokenizer.
  *
@@ -20,7 +20,7 @@
  * @name         HappyNodeTokenizer
  * @file         index.js
  * @description  A basic Twitter-aware tokenizer.
- * @version      2.1.0
+ * @version      2.1.1
  * @exports      (tokenize|tokenizeSync|tokenise|tokeniseSync)
  * @requires     he
  * @author       P. Hughes <peter@phugh.es> (https://www.phugh.es)
