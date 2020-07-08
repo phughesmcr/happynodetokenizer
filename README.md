@@ -176,7 +176,7 @@ When `opts.tag === true`, HappyNodeTokenizer will output an array of token objec
 | phone          | :heavy_check_mark: | :heavy_check_mark: | +1 (800) 123-4567
 | url            | :x:                | :heavy_check_mark: | http://www.youtube.com
 | url_scheme     | :x:                | :heavy_check_mark: | http://
-| url_command    | :x:                | :heavy_check_mark: | [0-3]
+| url_authority  | :x:                | :heavy_check_mark: | [0-3]
 | url_path_query | :x:                | :heavy_check_mark: | /index.html?s=search
 | htmltag        | :x:                | :heavy_check_mark: | \<em class='grumpy'>
 | emoticon       | :heavy_check_mark: | :heavy_check_mark: | >:(

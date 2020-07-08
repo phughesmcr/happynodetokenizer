@@ -242,7 +242,7 @@
       } else if (_dlatkWebStart.test(token)) {
         return 'url_scheme';
       } else if (_dlatkCommand.test(token)) {
-        return 'url_command';
+        return 'url_authority';
       } else if (_dlatkHttpGet.test(token)) {
         return 'url_path_query';
       } else if (_dlatkHtmlTags.test(token) && (!_dlatkEmoticons.test(token) || (_dlatkEmoticons.test(token) && /[a-zA-Z]{2,}/g.test(token)))) {
