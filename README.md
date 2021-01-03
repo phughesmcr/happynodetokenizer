@@ -1,4 +1,4 @@
-# HappyNodeTokenizer
+# 😄 HappyNodeTokenizer
 
 A basic Twitter aware tokenizer.
 
@@ -9,94 +9,39 @@ A Javascript port of [HappyFunTokenizer.py](https://github.com/stanfordnlp/pytho
   npm install --save happynodetokenizer
 ```
 
+`UMD`, `IIFE`, `CJS` and `ESM` builds are available in the `./dist` directory.
+
 ## Usage
-HappyNodeTokenizer exposes an asynchronous function called `tokenize()` and a synchronous function called `tokenizeSync()`. `tokenizeSync()` can also take a callback function as its third argument. The en-GB spelling can be used as well (i.e. `tokenise()` and `tokeniseSync()`).
+HappyNodeTokenizer exposes a function called `tokenize()` which takes up to 3 arguments: the input string to tokenize, an optional 'options' object (see below), and an optional callback function.
 
 
-### Async/Await
+### Example
 ```javascript
-const tokenizer = require('happynodetokenizer');
+import { tokenize } from 'happynodetokenizer'; // const tokenizer = require('happynodetokenizer'); can also be used
 const text = 'A big long string of text...';
 const opts = {
-  'logs': 2,
   'mode': 'stanford',
   'normalize': false,
   'preserveCase': false,
-  'strict': false,
   'tag': false,
 };
-const getTokens = async (text) => {
-  const tokens = await tokenizer.tokenize(text, opts);
-  console.log(tokens);
-};
-```
-
-If no tokens are found and `opts.strict = false`, happynodetokenizer will return an empty array.
-
-### Async .then().catch()
-```javascript
-const tokenizer = require('happynodetokenizer');
-const text = 'A big long string of text...';
-const opts = {
-  'logs': 2,
-  'mode': 'stanford',
-  'normalize': false,
-  'preserveCase': false,
-  'strict': false,
-  'tag': false,
-};
-tokenizer.tokenize(text, opts)
-  .then((tokens) => {
-    console.log(tokens);
-  })
-  .catch((err) => {
-    throw new Error(err);
-  });
-```
-
-### Callback
-```javascript
-const tokenizer = require('happynodetokenizer');
-const text = 'A big long string of text...';
-const opts = {
-  'logs': 2,
-  'mode': 'stanford',
-  'normalize': false,
-  'preserveCase': false,
-  'strict': false,
-  'tag': false,
-};
-tokenizer.tokenizeSync(text, opts, (err, tokens) => {
-  if (err) throw new Error(err);
-  console.log(tokens);
-});
-```
-
-### Sync
-```javascript
-const tokenizer = require('happynodetokenizer');
-const text = 'A big long string of text...';
-const opts = {
-  'logs': 2,
-  'mode': 'stanford',
-  'normalize': false,
-  'preserveCase': false,
-  'strict': false,
-  'tag': false,
-};
-const tokens = tokenizer.tokenizeSync(text, opts);
-console.log(tokens);
+const tokens = tokenize(text, opts);
+console.log(tokens)
 ```
 
 ## Output Examples
 ### Default (opts.tag = false)
-Input = "RT @ #happyfuncoding: this is a typical Twitter tweet :-)"
+__Input__ = "RT @ #happyfuncoding: this is a typical Twitter tweet :-)"
+
+__Output__ =
 ```javascript
 ['rt', '@', '#happyfuncoding', ':', 'this', 'is', 'a', 'typical', 'twitter', 'tweet', ':-)']
 ```
 
 ### opts.tag = true
-Input = "RT @ #happyfuncoding: this is a typical Twitter tweet :-)"
+__Input__ = "RT @ #happyfuncoding: this is a typical Twitter tweet :-)"
+
+__Output__ =
 ```javascript
 [
   { value: 'rt', tag: 'word' },
@@ -119,23 +64,12 @@ The options object and its properties are optional. The defaults are:
 
 ```javascript
 {
-  'logs': 2,
   'mode': 'stanford',
   'normalize': false,
   'preserveCase': false,
-  'strict': false,
   'tag': false,
 };
 ```
-
-### logs
-**Number - valid options: 0, 1, 2 (default), 3**
-
-Used to control console.log, console.warn, and console.error outputs.
-* 0 = suppress all logs
-* 1 = print errors only
-* 2 = print errors and warnings
-* 3 = print all console logs
 
 ### mode
 **string - valid options: `stanford` (default), or `dlatk`**
@@ -145,21 +79,14 @@ Used to control console.log, console.warn, and console.error outputs.
 `dlatk` mode uses the modified HappierFunTokenizing pattern. See [Github](https://github.com/dlatk/happierfuntokenizing/).
 
 ### normalize
-**boolean - valid options: `true`, or `false` (default)**
+**boolean - valid options: "NFC" | "NFD" | "NFKC" | "NFKD" (default = undefined)**
 
-[Normalize](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize) strings. E.g. when set to `true`, mañana becomes manana.
+[Normalize](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize) strings. E.g. when set, mañana becomes manana.
 
 ### preserveCase
 **boolean - valid options: `true`, or `false` (default)**
 
 Preserves the case of the input string. Does not affect emoticons.
-
-### strict
-**boolean - valid options: `true`, or `false` (default)**
-
-When `strict` is set to `true`, functions `throw` errors over very minor things. Good for debugging.
-* `false` = functions fail gracefully
-* `true`  = functions `throw` lots of errors
 
 ### tag
 **boolean - valid options: `true`, or `false` (default)**
@@ -184,7 +111,7 @@ When `opts.tag === true`, HappyNodeTokenizer will output an array of token objec
 | hashtag        | :heavy_check_mark: | :heavy_check_mark: | #tokenizing
 | punct          | :heavy_check_mark: | :heavy_check_mark: | ,
 | word           | :heavy_check_mark: | :heavy_check_mark: | hello
-| \<UNK>         | :heavy_check_mark: | :heavy_check_mark: | (anthing left unmatched)
+| \<UNK>         | :heavy_check_mark: | :heavy_check_mark: | (anything left unmatched)
 
 ## Testing
 To compare the results of HappyNodeTokenizer against HappyFunTokenizer and HappierFunTokenizing, run:
@@ -194,6 +121,6 @@ npm run test
 The goal of this project is to provide a Node.js port of HappyFunTokenizer and HappierFunTokenizing. Therefore, any pull requests with test failures will not be accepted.
 
 ## License
-(C) 2017-20 [P. Hughes](https://www.phugh.es). All rights reserved.
+(C) 2017-21 [P. Hughes](https://www.phugh.es). All rights reserved.
 
 Shared under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) license.
