@@ -187,6 +187,11 @@ function _html2unicode(str: string): string {
 
 //#region Tagging
 
+export interface TokenTagObject {
+  value: string,
+  tag: string,
+}
+
 function _getTag(token: string, mode: 'stanford' | 'dlatk') {
   if (mode === 'dlatk') {
     if (_dlatkPhoneNumbers.test(token)) {
@@ -239,7 +244,7 @@ function _getTag(token: string, mode: 'stanford' | 'dlatk') {
   }
 }
 
-function _createTokenObject(tokens: string[], mode: 'stanford' | 'dlatk'): Record<string, string>[] {
+function _createTokenObject(tokens: string[], mode: 'stanford' | 'dlatk'): TokenTagObject[] {
   return tokens.map((token) => {
     return {
       value: token,
@@ -252,11 +257,14 @@ function _createTokenObject(tokens: string[], mode: 'stanford' | 'dlatk'): Recor
 
 //#region tokenizer
 
+export type TokenizerCallback = (err?: string, res?: string[] | TokenTagObject[]) => void;
+
 export function tokenize(
     input: string,
     opts: Partial<TokenizerOptions>,
-    cb?: (err?: string, res?: string[] | Record<string, string>[]) => void
-  ): string[] | Record<string, string>[] | void {
+    cb?: TokenizerCallback,
+  ): string[] | TokenTagObject[] | void {
+
   // validate input
   if (!input || typeof input !== 'string') {
     if (cb && typeof cb === 'function') {
