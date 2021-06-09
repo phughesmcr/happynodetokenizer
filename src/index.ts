@@ -24,6 +24,8 @@
  *
  * Default options (opts):
  *  {
+ *    "locale": "en-US"     // controls the locale for toLocaleLowerCase() used when preserveCase = false
+ *
  *    "mode": "stanford"    // Switch between variations of implementation of HappierFunTokenizing.py
  *                          // "stanford" = https://github.com/stanfordnlp/python-stanford-corenlp/blob/master/tests/happyfuntokenizer.py
  *                          // "dlatk"    = https://github.com/dlatk/happierfuntokenizing/blob/master/happierfuntokenizing.py
@@ -45,6 +47,7 @@
  *  import { tokenize } from "happynodetokenizer";
  *  const text = "A big long string of text...";
  *  const opts = {
+ *      "locale": "en-US",
  *      "mode": "stanford",
  *      "normalize": false,
  *      "preserveCase": true,
@@ -111,13 +114,15 @@ export const dlatkTokenizerPattern = new RegExp(
 //#region options
 
 export interface TokenizerOptions {
-  mode: 'stanford' | 'dlatk',
-  normalize?: 'NFC' | 'NFD' | 'NFKC' | 'NFKD',
-  preserveCase: boolean,
-  tag: boolean,
+  locale: string;
+  mode: 'stanford' | 'dlatk';
+  normalize: 'NFC' | 'NFD' | 'NFKC' | 'NFKD' | undefined;
+  preserveCase: boolean;
+  tag: boolean;
 }
 
 const _defaultOptions: TokenizerOptions = {
+  locale: 'en-US',
   mode: 'stanford',
   normalize: undefined,
   preserveCase: true,
@@ -126,10 +131,13 @@ const _defaultOptions: TokenizerOptions = {
 
 function _validateOpts(opts: Partial<TokenizerOptions>): TokenizerOptions {
   const output: TokenizerOptions = {..._defaultOptions, ...opts};
+  // LOCALE
+  const locale = (typeof output.locale !== 'string') ? 'en-US' : output.locale;
+  output.locale = locale;
   // MODE
   const mode = (typeof output.mode !== 'string') ? 'stanford' : output.mode.toLowerCase();
   if (!/dlatk|stanford/.exec(mode)) {
-    throw new SyntaxError(`Tokenizer mode must be "stanford" or "dlatk", found "${output.mode}".`);
+    throw new SyntaxError(`Tokenizer mode must be "stanford" or "dlatk".`);
   }
   output.mode = mode as "stanford" | "dlatk";
   // NORMALIZE
@@ -305,11 +313,9 @@ export function tokenize(
   // handle preserveCase option
   if (options.preserveCase === false) {
     const emoticons = (options.mode === 'dlatk') ? _dlatkEmoticons : _stanfordEmoticons;
-    tokens = tokens.map((token) => {
-      if (emoticons.test(token)) {
-        return token;
-      } else {
-        return token.toLowerCase();
+    tokens.forEach((token, idx, arr) => {
+      if (!(emoticons.test(token))) {
+        arr[idx] = token.toLocaleLowerCase(options.locale);
       }
     });
   }
