@@ -3,14 +3,11 @@
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import dts from "rollup-plugin-dts";
-import fs from 'fs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import * as pkg from './package.json';
 import typescript from '@rollup/plugin-typescript';
 import { DEFAULT_EXTENSIONS } from '@babel/core';
 import { terser } from "rollup-plugin-terser";
-
-const license = fs.readFileSync('./LICENSE', 'utf-8').split(/\r?\n/g).reduce((str, line) => str += ` * ${line}\n`, '');
 
 const pkgName = pkg.name;
 const pkgVersion = pkg.version;
@@ -29,7 +26,7 @@ const bannerText =
  * ${pkgName}
  * v${pkgVersion}
  *
-${license}***************************************************************************** */\n`;
+ ****************************************************************************** */\n`;
 
 const input = './src/index.ts';
 
