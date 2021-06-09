@@ -4,9 +4,9 @@ import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import dts from "rollup-plugin-dts";
 import fs from 'fs';
-import pkg from './package.json';
-import resolve from '@rollup/plugin-node-resolve';
-import typescript from 'rollup-plugin-typescript2';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import * as pkg from './package.json';
+import typescript from '@rollup/plugin-typescript';
 import { DEFAULT_EXTENSIONS } from '@babel/core';
 import { terser } from "rollup-plugin-terser";
 
@@ -17,10 +17,19 @@ const pkgVersion = pkg.version;
 const extensions = [...DEFAULT_EXTENSIONS, '.ts', '.tsx'];
 
 // https://rollupjs.org/guide/en#external-e-external
-const external = [];
+const external = [
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.peerDependencies || {}),
+];
 const globals = {};
 
-const bannerText = "";
+const bannerText =
+`/*! *****************************************************************************
+ *
+ * ${pkgName}
+ * v${pkgVersion}
+ *
+${license}***************************************************************************** */\n`;
 
 const input = './src/index.ts';
 
@@ -33,9 +42,9 @@ export default [
 
     plugins: [
       // Allows node_modules resolution
-      resolve({
+      nodeResolve({
         extensions,
-        mainFields: ['jsnext:main, module, main'],
+        mainFields: ['module, main'],
       }),
 
       // Allow bundling cjs modules. Rollup doesn't understand cjs
@@ -46,19 +55,21 @@ export default [
 
       // Compile TypeScript/JavaScript files
       typescript({
-        clean: true,
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
+        module: "ES2020",
         tsconfig: "tsconfig.json",
         tslib: require('tslib'),
         typescript: require("typescript"),
       }),
 
       terser({
-        ecma: 2021,
+        ecma: 2020,
         module: true,
         keep_classnames: true,
         keep_fnames: true,
+        compress: true,
+        mangle: true,
       }),
     ],
 
@@ -81,25 +92,34 @@ export default [
 
     plugins: [
       // Allows node_modules resolution
-      resolve({ extensions }),
+      nodeResolve({
+        extensions,
+        mainFields: ['main', 'node'],
+      }),
 
       // Allow bundling cjs modules. Rollup doesn't understand cjs
       commonjs({ include: 'node_modules/**' }),
 
       // Compile TypeScript/JavaScript files
       typescript({
-        clean: true,
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
-        module: "cjs",
         tslib: require('tslib'),
         typescript: require("typescript"),
       }),
 
+      babel({
+        extensions,
+        babelHelpers: 'bundled',
+        include: ["src/**/*"],
+        exclude: ["node_modules/**/*"],
+      }),
+
       terser({
-        keep_classnames: true,
-        keep_fnames: true,
+        ecma: 2020,
+        compress: true,
+        mangle: true,
       }),
     ],
 
@@ -109,6 +129,7 @@ export default [
       exports: 'named',
       file: pkg.main,
       format: 'cjs',
+      name: pkgName,
       sourcemap: true,
       globals,
     },
@@ -121,9 +142,21 @@ export default [
     external,
 
     plugins: [
-      resolve({ extensions }),
+      nodeResolve({
+        extensions,
+        mainFields: ['browser', 'main'],
+        browser: true,
+      }),
 
       commonjs({ include: 'node_modules/**' }),
+
+      typescript({
+        exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
+        include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
+        tsconfig: "tsconfig.json",
+        tslib: require('tslib'),
+        typescript: require("typescript"),
+      }),
 
       babel({
         extensions,
@@ -132,7 +165,11 @@ export default [
         exclude: ["node_modules/**/*"],
       }),
 
-      terser(),
+      terser({
+        ecma: 2020,
+        compress: true,
+        mangle: true,
+      }),
     ],
 
     output: [{
@@ -142,6 +179,7 @@ export default [
       file: "./dist/umd/index.min.js",
       format: 'umd',
       name: pkgName,
+      noConflict: true,
       sourcemap: true,
       globals,
     }]
@@ -154,14 +192,23 @@ export default [
     external,
 
     plugins: [
-      resolve({
+      nodeResolve({
         extensions,
+        mainFields: ['browser', 'main'],
         browser: true,
       }),
 
       commonjs({
         include: 'node_modules/**',
         transformMixedEsModules: true,
+      }),
+
+      typescript({
+        exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
+        include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
+        tsconfig: "tsconfig.json",
+        tslib: require('tslib'),
+        typescript: require("typescript"),
       }),
 
       babel({
@@ -172,9 +219,9 @@ export default [
       }),
 
       terser({
-        module: false,
-        keep_classnames: true,
-        keep_fnames: true,
+        ecma: 2020,
+        compress: true,
+        mangle: true,
       }),
     ],
 
