@@ -1,18 +1,24 @@
 /*! *****************************************************************************
  *
  * happynodetokenizer
- * v3.0.0
+ * v3.1.0
  *
  ****************************************************************************** */
 
 declare const stanfordTokenizerPattern: RegExp;
 declare const dlatkTokenizerPattern: RegExp;
 interface TokenizerOptions {
+    locale: string;
     mode: 'stanford' | 'dlatk';
-    normalize?: 'NFC' | 'NFD' | 'NFKC' | 'NFKD';
+    normalize: 'NFC' | 'NFD' | 'NFKC' | 'NFKD' | undefined;
     preserveCase: boolean;
     tag: boolean;
 }
-declare function tokenize(input: string, opts: Partial<TokenizerOptions>, cb?: (err?: string, res?: string[] | Record<string, string>[]) => void): string[] | Record<string, string>[] | void;
+interface TokenTagObject {
+    value: string;
+    tag: string;
+}
+declare type TokenizerCallback = (err?: string, res?: string[] | TokenTagObject[]) => void;
+declare function tokenize(input: string, opts: Partial<TokenizerOptions>, cb?: TokenizerCallback): string[] | TokenTagObject[] | void;
 
-export { TokenizerOptions, dlatkTokenizerPattern, stanfordTokenizerPattern, tokenize };
+export { TokenTagObject, TokenizerCallback, TokenizerOptions, dlatkTokenizerPattern, stanfordTokenizerPattern, tokenize };
