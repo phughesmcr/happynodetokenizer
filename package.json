@@ -7,6 +7,12 @@
   "browser": "dist/iife/index.min.js",
   "types": "dist/cjs/index.d.ts",
   "type": "module",
+  "exports": {
+    "require": "./dist/umd/index.min.js",
+    "import": "./dist/esm/index.min.js",
+    "node": "./dist/cjs/index.min.js",
+    "browser": "./dist/iife/index.min.js"
+  },
   "directories": {
     "dist": "dist",
     "doc": "docs",
@@ -84,6 +90,6 @@
   },
   "homepage": "https://github.com/phugh/happynodetokenizer",
   "dependencies": {
-    "core-js": "^3.14.0"
+    "core-js": "^3.18.0"
   }
 }

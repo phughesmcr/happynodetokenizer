@@ -3,6 +3,9 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
+    "ecmaFeatures": {
+      "modules": true
+    },
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
@@ -11,6 +14,7 @@
   ],
   "extends": [
     "eslint:recommended",
+    "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
@@ -18,16 +22,5 @@
     "node": true,
     "es2020": true,
     "browser": true
-  },
-  "rules": {
-    "semi": [2, "always"],
-    "no-multi-spaces": 1,
-    "max-len": [1, 120, 2, {
-      "ignoreUrls": true,
-      "ignoreComments": false,
-      "ignoreRegExpLiterals": true,
-      "ignoreStrings": false,
-      "ignoreTemplateLiterals": true
-    }]
   }
 }

@@ -1,34 +1,30 @@
 "use strict";
 
-import babel from '@rollup/plugin-babel';
-import commonjs from '@rollup/plugin-commonjs';
+import babel from "@rollup/plugin-babel";
+import commonjs from "@rollup/plugin-commonjs";
 import dts from "rollup-plugin-dts";
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import * as pkg from './package.json';
-import typescript from '@rollup/plugin-typescript';
-import { DEFAULT_EXTENSIONS } from '@babel/core';
+import fs from "fs";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import * as pkg from "./package.json";
+import typescript from "@rollup/plugin-typescript";
+import { DEFAULT_EXTENSIONS } from "@babel/core";
 import { terser } from "rollup-plugin-terser";
 
+const license = fs.readFileSync("./LICENSE", "utf-8").split(/\r?\n/g).reduce((str, line) => str += ` * ${line}\n`, "");
 const pkgName = pkg.name;
 const pkgVersion = pkg.version;
-const extensions = [...DEFAULT_EXTENSIONS, '.ts', '.tsx'];
-
-// https://rollupjs.org/guide/en#external-e-external
-const external = [
-  ...Object.keys(pkg.dependencies || {}),
-  ...Object.keys(pkg.peerDependencies || {}),
-];
+const extensions = [...DEFAULT_EXTENSIONS, ".ts", ".tsx"];
+const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
 const globals = {};
-
 const bannerText =
 `/*! *****************************************************************************
  *
  * ${pkgName}
  * v${pkgVersion}
  *
- ****************************************************************************** */\n`;
+${license}***************************************************************************** */\n`;
 
-const input = './src/index.ts';
+const input = "./src/index.ts";
 
 export default [
   // ESM
@@ -38,47 +34,50 @@ export default [
     external,
 
     plugins: [
-      // Allows node_modules resolution
       nodeResolve({
         extensions,
-        mainFields: ['module, main'],
+        mainFields: ["module", "main"],
       }),
 
-      // Allow bundling cjs modules. Rollup doesn't understand cjs
       commonjs({
-        include: 'node_modules/**',
+        include: "node_modules/**",
         transformMixedEsModules: true,
        }),
 
-      // Compile TypeScript/JavaScript files
       typescript({
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         module: "ES2020",
         tsconfig: "tsconfig.json",
-        tslib: require('tslib'),
+        tslib: require("tslib"),
         typescript: require("typescript"),
       }),
 
+      babel({
+        extensions,
+        babelHelpers: "bundled",
+        include: ["src/**/*"],
+        exclude: ["node_modules/**/*"],
+      }),
+
       terser({
+        safari10: true,
         ecma: 2020,
         module: true,
-        keep_classnames: true,
-        keep_fnames: true,
         compress: true,
         mangle: true,
       }),
     ],
 
-    output: {
+    output: [{
       banner: bannerText,
       esModule: true,
-      exports: 'named',
-      file: pkg.module,
+      exports: "named",
+      file: "./dist/esm/index.min.js",
       format: "es",
       sourcemap: true,
       globals,
-    },
+    }],
   },
 
   // CJS
@@ -88,27 +87,27 @@ export default [
     external,
 
     plugins: [
-      // Allows node_modules resolution
       nodeResolve({
         extensions,
-        mainFields: ['main', 'node'],
+        mainFields: ["node", "main"],
       }),
 
-      // Allow bundling cjs modules. Rollup doesn't understand cjs
-      commonjs({ include: 'node_modules/**' }),
+      commonjs({
+        include: "node_modules/**",
+        transformMixedEsModules: true,
+      }),
 
-      // Compile TypeScript/JavaScript files
       typescript({
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
-        tslib: require('tslib'),
+        tslib: require("tslib"),
         typescript: require("typescript"),
       }),
 
       babel({
         extensions,
-        babelHelpers: 'bundled',
+        babelHelpers: "bundled",
         include: ["src/**/*"],
         exclude: ["node_modules/**/*"],
       }),
@@ -123,16 +122,16 @@ export default [
     output: {
       banner: bannerText,
       esModule: false,
-      exports: 'named',
-      file: pkg.main,
-      format: 'cjs',
+      exports: "named",
+      file: "./dist/cjs/index.min.js",
+      format: "cjs",
       name: pkgName,
       sourcemap: true,
       globals,
     },
   },
 
-  // UMD
+  // UMD & IIFE
   {
     input,
 
@@ -141,23 +140,23 @@ export default [
     plugins: [
       nodeResolve({
         extensions,
-        mainFields: ['browser', 'main'],
+        mainFields: ["browser", "main"],
         browser: true,
       }),
 
-      commonjs({ include: 'node_modules/**' }),
+      commonjs({ include: "node_modules/**" }),
 
       typescript({
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
-        tslib: require('tslib'),
+        tslib: require("tslib"),
         typescript: require("typescript"),
       }),
 
       babel({
         extensions,
-        babelHelpers: 'bundled',
+        babelHelpers: "bundled",
         include: ["src/**/*"],
         exclude: ["node_modules/**/*"],
       }),
@@ -169,96 +168,51 @@ export default [
       }),
     ],
 
-    output: [{
-      banner: bannerText,
-      esModule: false,
-      exports: 'named',
-      file: "./dist/umd/index.min.js",
-      format: 'umd',
-      name: pkgName,
-      noConflict: true,
-      sourcemap: true,
-      globals,
-    }]
+    output: [
+      {
+        banner: bannerText,
+        esModule: false,
+        exports: "named",
+        file: "./dist/umd/index.min.js",
+        format: "umd",
+        name: pkgName,
+        noConflict: true,
+        sourcemap: true,
+        globals,
+      },
+      {
+        banner: bannerText,
+        esModule: false,
+        exports: "named",
+        file: "./dist/iife/index.min.js",
+        format: "iife",
+        name: pkgName,
+        sourcemap: true,
+        globals,
+      }
+    ]
   },
-
-  // BROWSER IIFE
-  {
-    input,
-
-    external,
-
-    plugins: [
-      nodeResolve({
-        extensions,
-        mainFields: ['browser', 'main'],
-        browser: true,
-      }),
-
-      commonjs({
-        include: 'node_modules/**',
-        transformMixedEsModules: true,
-      }),
-
-      typescript({
-        exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
-        include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
-        tsconfig: "tsconfig.json",
-        tslib: require('tslib'),
-        typescript: require("typescript"),
-      }),
-
-      babel({
-        extensions,
-        babelHelpers: 'bundled',
-        include: ["src/**/*"],
-        exclude: ["node_modules/**/*"],
-      }),
-
-      terser({
-        ecma: 2020,
-        compress: true,
-        mangle: true,
-      }),
-    ],
-
-    output: [{
-      banner: bannerText,
-      esModule: false,
-      exports: 'named',
-      file: pkg.browser,
-      format: 'iife',
-      name: pkgName,
-      sourcemap: true,
-      globals,
-    }],
-  },
-
   // TYPESCRIPT DECLARATIONS
   {
     input: "./types/index.d.ts",
     output: [
       // CJS
       {
-        banner: bannerText,
-        file: pkg.types,
+        file: "./dist/cjs/index.min.d.ts",
         format: "es"
       },
       // UMD
       {
-        banner: bannerText,
         file: "./dist/umd/index.min.d.ts",
         format: "es"
       },
       // Browser
       {
-        banner: bannerText,
         file: "./dist/iife/index.min.d.ts",
         format: "es"
       },
-      // Module
+      // ESM
       {
-        banner: bannerText,
         file: "./dist/esm/index.min.d.ts",
         format: "es"
       },
