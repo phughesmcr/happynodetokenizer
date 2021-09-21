@@ -1,7 +1,6 @@
 /** String tokenizer */
 "use strict";
 
-import { Mode, NormalizationForm } from "./constants";
 import { normalizeOpts, TokenizerOptions } from "./options";
 import { dlatkEmoticons, dlatkTokenizerPattern, stanfordEmoticons, stanfordTokenizerPattern } from "./patterns";
 import { htmlToUnicode, normalizeStr, removeHex } from "./strings";
@@ -25,8 +24,8 @@ function createCaseHandler(preserveCase: boolean) {
 }
 
 /** Creates a function that returns an array of all RegExp matches */
-function createMatcher(mode: Mode) {
-  const pattern = mode === Mode.dlatk ? dlatkTokenizerPattern : stanfordTokenizerPattern;
+function createMatcher(mode: "stanford" | "dlatk") {
+  const pattern = mode === "dlatk" ? dlatkTokenizerPattern : stanfordTokenizerPattern;
   return function* (str: string) {
     pattern.lastIndex = 0;
     let m: RegExpExecArray | null;
@@ -37,13 +36,13 @@ function createMatcher(mode: Mode) {
 }
 
 /** Creates a function that will normalize a string if a valid form is given */
-function createNormalizer(form?: NormalizationForm | null): (str: string) => string {
+function createNormalizer(form?: "NFC" | "NFD" | "NFKC" | "NFKD" | null): (str: string) => string {
   return form ? normalizeStr(form) : noop;
 }
 
 /** Creates a function that replaces hex codes in dlatk mode */
-function createHexReplacer(mode: Mode): (str: string) => string {
-  return mode === Mode.dlatk ? removeHex : noop;
+function createHexReplacer(mode: "stanford" | "dlatk"): (str: string) => string {
+  return mode === "dlatk" ? removeHex : noop;
 }
 
 /** Avoid mutating the original string by creating a copy */

@@ -1,19 +1,20 @@
 /** Tokenizer options object handling. */
 "use strict";
 
-import { Mode, MODE_PATTERN, NormalizationForm, NORM_PATTERN } from "./constants";
+const MODE_PATTERN = /dlatk|stanford/;
+const NORM_PATTERN = /NFK?(C|D)/;
 
 export interface TokenizerOptions {
   /** Defaults to "stanford" */
-  mode?: Mode;
+  mode?: "stanford" | "dlatk";
   /** Defaults to `undefined` */
-  normalize?: NormalizationForm | null;
+  normalize?: "NFC" | "NFD" | "NFKC" | "NFKD" | null;
   /** Defaults to `true` */
   preserveCase?: boolean;
 }
 
 export function normalizeOpts(opts: TokenizerOptions): Required<TokenizerOptions> {
-  const { mode = Mode.stanford, normalize = null, preserveCase = true } = opts;
+  const { mode = "stanford", normalize = null, preserveCase = true } = opts;
 
   const _mode = mode.toLowerCase();
   const _normalize = normalize?.toUpperCase() ?? null;
@@ -28,8 +29,8 @@ export function normalizeOpts(opts: TokenizerOptions): Required<TokenizerOptions
   }
 
   return {
-    mode: typeof mode !== "string" ? Mode.stanford : (_mode as Mode),
-    normalize: typeof normalize !== "string" ? null : (_normalize as NormalizationForm),
+    mode: typeof mode !== "string" ? "stanford" : (_mode as "stanford" | "dlatk"),
+    normalize: typeof normalize !== "string" ? null : (_normalize as "NFC" | "NFD" | "NFKC" | "NFKD"),
     preserveCase: Boolean(preserveCase),
   };
 }
