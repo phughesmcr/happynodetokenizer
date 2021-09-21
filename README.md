@@ -1,8 +1,14 @@
 # 😄 HappyNodeTokenizer
 
-A basic Twitter aware tokenizer for Javascript environments (Node &amp; browser).
+A basic Twitter aware tokenizer for Javascript environments.
 
 A Typescript port of [HappyFunTokenizer.py](https://github.com/stanfordnlp/python-stanford-corenlp/blob/master/tests/happyfuntokenizer.py) by Christopher Potts and  [HappierFunTokenizing.py](https://github.com/dlatk/happierfuntokenizing) by H. Andrew Schwartz.
+
+## Features
+* Typescript definitions
+* Uses generators / memoize for efficiency
+* Customizable and easy to use
+* Compiled with Babel for extensive browser/environment support
 
 ## Install
 ```bash
@@ -32,16 +38,19 @@ const opts = {
 // create a tokenizer instance with our options
 const myTokenizer = tokenizer(opts);
 
-// tokenize the input using our tokenizer
-const tokens = myTokenizer(text);
+// calling myTokenizer returns a generator function
+const tokenGenerator = myTokenizer(text);
 
-// array of token objects
-console.log(tokens);
+// you can turn the generator into an array of token objects like this:
+const tokens = [...tokenGenerator()];
 
-// convert token objects to array of strings if needed
+// you can also convert token objects to array of strings like this:
 const values = Array.from(tokens, (token) => token.value);
 ```
 #### Output
+
+The `tokens` variable in the above example will look like this:
+
 ```javascript
 [
   { idx: 0, value: 'rt', tag: 'word' },
