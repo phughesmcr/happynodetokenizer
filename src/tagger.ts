@@ -1,6 +1,8 @@
 /** Token type tagger */
 "use strict";
 
+import { Mode } from "./constants";
+import { memoize } from "./utils";
 import {
   dlatkPhoneNumbers,
   dlatkWebAddressFull,
@@ -81,10 +83,6 @@ function getStanfordTag(token: string): string {
   }
 }
 
-export function getTag(token: string, mode: "stanford" | "dlatk"): string {
-  if (mode === "dlatk") {
-    return getDlatkTag(token);
-  } else {
-    return getStanfordTag(token);
-  }
+export function createTagger(mode: Mode): (str: string) => string {
+  return mode === "dlatk" ? memoize<string, string>(getDlatkTag) : memoize<string, string>(getStanfordTag);
 }

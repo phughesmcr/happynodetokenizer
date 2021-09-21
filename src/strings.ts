@@ -12,8 +12,8 @@ const AND_STRING = " and ";
 const EMPTY_STRING = "";
 const SPECIAL_CHARS = /[\u0300-\u036f]/g;
 
-export function normalizeStr(str: string, form?: string): string {
-  return str.normalize(form).replace(SPECIAL_CHARS, EMPTY_STRING);
+export function normalizeStr(form?: string): (str: string) => string {
+  return (str: string) => str.normalize(form).replace(SPECIAL_CHARS, EMPTY_STRING);
 }
 
 export function removeHex(str: string): string {

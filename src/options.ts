@@ -6,7 +6,7 @@ import { Mode, MODE_PATTERN, NormalizationForm, NORM_PATTERN } from "./constants
 export interface TokenizerOptions {
   /** Defaults to "stanford" */
   mode?: Mode;
-  /** Defaults to `null` */
+  /** Defaults to `undefined` */
   normalize?: NormalizationForm | null;
   /** Defaults to `true` */
   preserveCase?: boolean;

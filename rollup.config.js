@@ -3,16 +3,13 @@
 import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import dts from "rollup-plugin-dts";
-import fs from "fs";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import * as pkg from "./package.json";
 import typescript from "@rollup/plugin-typescript";
 import { DEFAULT_EXTENSIONS } from "@babel/core";
 import { terser } from "rollup-plugin-terser";
 
-const license = fs.readFileSync("./LICENSE", "utf-8").split(/\r?\n/g).reduce((str, line) => str += ` * ${line}\n`, "");
 const pkgName = pkg.name;
-const pkgVersion = pkg.version;
 const extensions = [...DEFAULT_EXTENSIONS, ".ts", ".tsx"];
 const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
 const globals = {};
@@ -20,9 +17,10 @@ const bannerText =
 `/*! *****************************************************************************
  *
  * ${pkgName}
- * v${pkgVersion}
+ * v${pkg.version}
+ * license ${pkg.license}
  *
-${license}***************************************************************************** */\n`;
+ ***************************************************************************** */\n`;
 
 const input = "./src/index.ts";
 
@@ -42,7 +40,7 @@ export default [
       commonjs({
         include: "node_modules/**",
         transformMixedEsModules: true,
-       }),
+      }),
 
       typescript({
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],

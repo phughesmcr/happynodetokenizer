@@ -12,15 +12,15 @@ declare const enum NormalizationForm {
 interface TokenizerOptions {
     /** Defaults to "stanford" */
     mode?: Mode;
-    /** Defaults to `null` */
+    /** Defaults to `undefined` */
     normalize?: NormalizationForm | null;
     /** Defaults to `true` */
     preserveCase?: boolean;
 }
 
 interface Token {
-    /** The tokens index (begins at 0) */
-    idx: number;
+    /** The token's line offset (begins at 0) */
+    offset: number;
     /** The token's type (e.g., "punct" for punctuation) */
     tag: string;
     /** The token itself */
@@ -34,6 +34,6 @@ interface Token {
  * @param opts.preserveCase Preserve the tokens' case; does not affect emoticons. Defaults to `true`.
  * @returns the tokenizer function
  */
-declare function tokenizer(opts?: TokenizerOptions): (input: string) => Token[];
+declare function tokenizer(opts?: TokenizerOptions): (input: string) => () => Generator<Token, void, unknown>;
 
 export { tokenizer };
