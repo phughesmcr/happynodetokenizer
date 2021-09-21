@@ -1,19 +1,8 @@
-declare const enum Mode {
-    stanford = "stanford",
-    dlatk = "dlatk"
-}
-declare const enum NormalizationForm {
-    NFC = "NFC",
-    NFD = "NFD",
-    NFKC = "NFKC",
-    NFKD = "NFKD"
-}
-
 interface TokenizerOptions {
     /** Defaults to "stanford" */
-    mode?: Mode;
+    mode?: "stanford" | "dlatk";
     /** Defaults to `undefined` */
-    normalize?: NormalizationForm | null;
+    normalize?: "NFC" | "NFD" | "NFKC" | "NFKD" | null;
     /** Defaults to `true` */
     preserveCase?: boolean;
 }
