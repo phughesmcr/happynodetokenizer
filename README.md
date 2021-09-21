@@ -1,8 +1,8 @@
 # 😄 HappyNodeTokenizer
 
-A basic Twitter aware tokenizer.
+A basic Twitter aware tokenizer for Javascript environments (Node &amp; browser).
 
-A Javascript port of [HappyFunTokenizer.py](https://github.com/stanfordnlp/python-stanford-corenlp/blob/master/tests/happyfuntokenizer.py) by Christopher Potts and  [HappierFunTokenizing.py](https://github.com/dlatk/happierfuntokenizing) by H. Andrew Schwartz.
+A Typescript port of [HappyFunTokenizer.py](https://github.com/stanfordnlp/python-stanford-corenlp/blob/master/tests/happyfuntokenizer.py) by Christopher Potts and  [HappierFunTokenizing.py](https://github.com/dlatk/happierfuntokenizing) by H. Andrew Schwartz.
 
 ## Install
 ```bash
@@ -12,52 +12,51 @@ A Javascript port of [HappyFunTokenizer.py](https://github.com/stanfordnlp/pytho
 `UMD`, `IIFE`, `CJS` and `ESM` builds are available in the `./dist` directory.
 
 ## Usage
-HappyNodeTokenizer exposes a function called `tokenize()` which takes up to 3 arguments: the input string to tokenize, an optional 'options' object (see below), and an optional callback function.
+HappyNodeTokenizer exposes a function called `tokenizer()` which takes an optional configuration object *(See "The Options Object" below)*.
 
 
 ### Example
 ```javascript
-import { tokenize } from 'happynodetokenizer'; // const tokenizer = require('happynodetokenizer'); can also be used
-const text = 'A big long string of text...';
+import { tokenizer } from 'happynodetokenizer';
+// or: const tokenizer = require('happynodetokenizer');
+
+const text = 'RT @ #happyfuncoding: this is a typical Twitter tweet :-)';
+
+// these are the default options
 const opts = {
   'mode': 'stanford',
-  'normalize': false,
-  'preserveCase': false,
-  'tag': false,
+  'normalize': undefined,
+  'preserveCase': true,
 };
-const tokens = tokenize(text, opts);
-console.log(tokens)
+
+// create a tokenizer instance with our options
+const myTokenizer = tokenizer(opts);
+
+// tokenize the input using our tokenizer
+const tokens = myTokenizer(text);
+
+// array of token objects
+console.log(tokens);
+
+// convert token objects to array of strings if needed
+const values = Array.from(tokens, (token) => token.value);
 ```
-
-## Output Examples
-### Default (opts.tag = false)
-__Input__ = "RT @ #happyfuncoding: this is a typical Twitter tweet :-)"
-
-__Output__ =
-```javascript
-['rt', '@', '#happyfuncoding', ':', 'this', 'is', 'a', 'typical', 'twitter', 'tweet', ':-)']
-```
-
-### opts.tag = true
-__Input__ = "RT @ #happyfuncoding: this is a typical Twitter tweet :-)"
-
-__Output__ =
+#### Output
 ```javascript
 [
-  { value: 'rt', tag: 'word' },
-  { value: '@', tag: 'punct' },
-  { value: '#happyfuncoding', tag: 'hashtag' },
-  { value: ':', tag: 'punct' },
-  { value: 'this', tag: 'word' },
-  { value: 'is', tag: 'word' },
-  { value: 'a', tag: 'word' },
-  { value: 'typical', tag: 'word' },
-  { value: 'twitter', tag: 'word' },
-  { value: 'tweet', tag: 'word' },
-  { value: ':-)', tag: 'emoticon' }
+  { idx: 0, value: 'rt', tag: 'word' },
+  { idx: 1, value: '@', tag: 'punct' },
+  { idx: 2, value: '#happyfuncoding', tag: 'hashtag' },
+  { idx: 3, value: ':', tag: 'punct' },
+  { idx: 4, value: 'this', tag: 'word' },
+  { idx: 5, value: 'is', tag: 'word' },
+  { idx: 6, value: 'a', tag: 'word' },
+  { idx: 7, value: 'typical', tag: 'word' },
+  { idx: 8, value: 'twitter', tag: 'word' },
+  { idx: 9, value: 'tweet', tag: 'word' },
+  { idx: 10, value: ':-)', tag: 'emoticon' }
 ]
 ```
-See [tags]() below for more detail.
 
 ## The Options Object
 The options object and its properties are optional. The defaults are:
@@ -65,9 +64,8 @@ The options object and its properties are optional. The defaults are:
 ```javascript
 {
   'mode': 'stanford',
-  'normalize': false,
-  'preserveCase': false,
-  'tag': false,
+  'normalize': undefined,
+  'preserveCase': true,
 };
 ```
 
@@ -79,24 +77,19 @@ The options object and its properties are optional. The defaults are:
 `dlatk` mode uses the modified HappierFunTokenizing pattern. See [Github](https://github.com/dlatk/happierfuntokenizing/).
 
 ### normalize
-**boolean - valid options: "NFC" | "NFD" | "NFKC" | "NFKD" (default = undefined)**
+**string - valid options: "NFC" | "NFD" | "NFKC" | "NFKD" (default = undefined)**
 
-[Normalize](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize) strings. E.g. when set, mañana becomes manana.
+[Normalize](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize) strings (e.g., when set, mañana becomes manana).
+
+Normalization is disabled with set to null or undefined (default).
 
 ### preserveCase
 **boolean - valid options: `true`, or `false` (default)**
 
 Preserves the case of the input string. Does not affect emoticons.
 
-### tag
-**boolean - valid options: `true`, or `false` (default)**
-
-Return an array of tagged token objects instead of just an array of tokens
- * `true` = return an array of token objects: [ {value: 'token', tag: 'word' }, ... ]
- * `false` = return an array of tokens: [ 'token', 'another', 'word', ... ]
-
 ## Tags
-When `opts.tag === true`, HappyNodeTokenizer will output an array of token objects. Each token object has two properties: `value` and `tag`. The `value` is the token itself, the `tag` is a descriptor based on one of the following depending on which `opt.mode` you are using:
+HappyNodeTokenizer outputs an array of token objects. Each token object has three properties: `idx`, `value` and `tag`. The `value` is the token itself, the `idx` is the token's original index in the output, the `tag` is a descriptor based on one of the following depending on which `opt.mode` you are using:
 
 | Tag            | Stanford           | DLATK              | Example  |
 | -------------  |-------------       | -----              | -------- |
@@ -107,7 +100,7 @@ When `opts.tag === true`, HappyNodeTokenizer will output an array of token objec
 | url_path_query | :x:                | :heavy_check_mark: | /index.html?s=search
 | htmltag        | :x:                | :heavy_check_mark: | \<em class='grumpy'>
 | emoticon       | :heavy_check_mark: | :heavy_check_mark: | >:(
-| username       | :heavy_check_mark: | :heavy_check_mark: | @phughesmcr
+| username       | :heavy_check_mark: | :heavy_check_mark: | @somefaketwitterhandle
 | hashtag        | :heavy_check_mark: | :heavy_check_mark: | #tokenizing
 | punct          | :heavy_check_mark: | :heavy_check_mark: | ,
 | word           | :heavy_check_mark: | :heavy_check_mark: | hello
@@ -118,7 +111,12 @@ To compare the results of HappyNodeTokenizer against HappyFunTokenizer and Happi
 ```bash
 npm run test
 ```
-The goal of this project is to provide a Node.js port of HappyFunTokenizer and HappierFunTokenizing. Therefore, any pull requests with test failures will not be accepted.
+The goal of this project is to provide an accurate port of HappyFunTokenizer and HappierFunTokenizing. Therefore, any pull requests with test failures will not be accepted.
+
+## Acknowledgements
+Based on [HappyFunTokenizer.py](https://github.com/stanfordnlp/python-stanford-corenlp/blob/master/tests/happyfuntokenizer.py) by Christopher Potts and  [HappierFunTokenizing.py](https://github.com/dlatk/happierfuntokenizing) by H. Andrew Schwartz.
+
+Uses the ["he" library](https://github.com/mathiasbynens/he) by Mathias Bynens under the MIT license.
 
 ## License
 (C) 2017-21 [P. Hughes](https://www.phugh.es). All rights reserved.

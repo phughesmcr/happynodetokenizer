@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 'use strict';
-import { tokenize } from '../dist/esm/index.min.js';
+import { tokenizer } from '../dist/esm/index.min.js';
 
 /**
  * Input strings
@@ -45,7 +45,7 @@ const compareResults = (results, opts) => {
     for (let j = 0; j < result.length; j++) {
       if (opts && opts.mode && opts.mode === 'dlatk') {
         if (result[j] === dlatkResultStrings[i][j]) continue;
-        console.log(`Missmatch in test ${i}: Found "${result[j]}", expected "${dlatkResultStrings[i][j]}".\n`);
+        console.log(`Mismatch in test ${i}: Found "${result[j]}", expected "${dlatkResultStrings[i][j]}".\n`);
       } else {
         if (result[j] === stanfordResultStrings[i][j]) continue;
       }
@@ -65,10 +65,11 @@ const compareResults = (results, opts) => {
 
 const syncTests = (opts) => {
   console.log('Running sync tests...\n');
+  const tokenize = tokenizer(opts);
   const results = [];
   for (const str of testStrings) {
     const res = tokenize(str, opts);
-    results.push(res);
+    results.push(Array.from(res, (m) => m.value));
   }
   const errors = compareResults(results, opts);
   if (errors > 0) {
