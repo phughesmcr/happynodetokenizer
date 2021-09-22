@@ -1,6 +1,6 @@
 {
   "name": "happynodetokenizer",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "A simple, Twitter-aware tokenizer.",
   "main": "dist/cjs/index.min.js",
   "module": "dist/esm/index.min.js",

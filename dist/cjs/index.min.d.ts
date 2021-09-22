@@ -7,14 +7,14 @@ interface TokenizerOptions {
     preserveCase?: boolean;
 }
 
-interface Token {
+declare type Token = {
     /** The token's line offset (begins at 0) */
     offset: number;
     /** The token's type (e.g., "punct" for punctuation) */
     tag: string;
     /** The token itself */
     value: string;
-}
+};
 /**
  * Create a tokenizer with a given set of options configured
  * @param opts optional tokenizer options
@@ -25,4 +25,4 @@ interface Token {
  */
 declare function tokenizer(opts?: TokenizerOptions): (input: string) => () => Generator<Token, void, unknown>;
 
-export { tokenizer };
+export { Token, tokenizer };
