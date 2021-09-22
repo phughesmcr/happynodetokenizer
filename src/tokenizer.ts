@@ -7,14 +7,14 @@ import { htmlToUnicode, normalizeStr, removeHex } from "./strings";
 import { createTagger } from "./tagger";
 import { memoize, noop, pipe } from "./utils";
 
-export interface Token {
+export type Token = {
   /** The token's line offset (begins at 0) */
   offset: number;
   /** The token's type (e.g., "punct" for punctuation) */
   tag: string;
   /** The token itself */
   value: string;
-}
+};
 
 /** Creates a function that handles case preservation */
 function createCaseHandler(preserveCase: boolean) {
