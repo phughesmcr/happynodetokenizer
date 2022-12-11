@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /**
  * RegExp patterns for Stanford and DLATK tokenizing.
  *
@@ -14,8 +15,7 @@ export const stanfordEmoticons = /(?:[<>]?[:;=8][-o*']?[)\]([dDpP/:}{@|\\]|[)\](
 export const stanfordHtmlTags = /<[^>]+>/;
 export const stanfordTwitterUsernames = /(?:@[\w_]+)/;
 export const stanfordHashtags = /(?:#+[\w_]+[\w'_-]*[\w_]+)/;
-export const stanfordRemaining =
-  /(?:[a-z\u00C0-\u00FF][a-z\u00C0-\u00FF'_-]+[a-z\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/u; // see "accentedChars" above
+export const stanfordRemaining = /(?:[a-z\u00C0-\u00FF][a-z\u00C0-\u00FF'_-]+[a-z\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/u;
 
 export const stanfordTokenizerPattern = new RegExp(
   stanfordPhoneNumbers.source +
@@ -35,18 +35,15 @@ export const stanfordTokenizerPattern = new RegExp(
 
 //#region DLATK
 export const dlatkPhoneNumbers = /(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/;
-export const dlatkEmoticons =
-  /(?:[<>]?[:;=8>][-o*']?[)\]([dDpPxX/:}{@|\\]|[)\]([dDpPxX/:}{@|\\][-o*']?[:;=8<][<>]?|<[/\\]?3|\(?\(?#?[>\-^*+o~][_.|oO,][<\-^*+o~][#;]?\)?\)?)/;
-export const dlatkWebAddressFull =
-  /(?:(?:http[s]?:\/\/)?(?:[\w_-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg)(?:\/[\s\b$])?)/;
+export const dlatkEmoticons = /(?:[<>]?[:;=8>][-o*']?[)\]([dDpPxX/:}{@|\\]|[)\]([dDpPxX/:}{@|\\][-o*']?[:;=8<][<>]?|<[/\\]?3|\(?\(?#?[>\-^*+o~][_.|oO,][<\-^*+o~][#;]?\)?\)?)/;
+export const dlatkWebAddressFull = /(?:(?:http[s]?:\/\/)?(?:[\w_-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg)(?:\/[\s\b$])?)/;
 export const dlatkWebStart = /(?:http[s]?:\/\/)/;
 export const dlatkCommand = /(?:\[[\w_]+\])/;
 export const dlatkHttpGet = /(?:\/\w+\?(?:;?\w+=\w+)+)/;
 export const dlatkHtmlTags = /(?:<[^>]+\w=[^>]+>|<[^>]+\s\/>|<[^>\s]+>?|<?[^<\s]+>)/;
 export const dlatkTwitterUsernames = /(?:@[\w_]+)/;
 export const dlatkHashtags = /(?:#+[\w_]+[\w'_-]*[\w_]+)/;
-export const dlatkRemaining =
-  /(?:[\w\u00C0-\u00FF][\w\u00C0-\u00FF'_-]+[\w\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/u; // see "_accentedChars" above
+export const dlatkRemaining = /(?:[\w\u00C0-\u00FF][\w\u00C0-\u00FF'_-]+[\w\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/u; // see "_accentedChars" above
 
 export const dlatkTokenizerPattern = new RegExp(
   dlatkPhoneNumbers.source +
