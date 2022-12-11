@@ -9,7 +9,7 @@ import type { TokenizerMode, TokenMatchData, TokenizerNormalization, TokenizerOp
 
 /** Creates a function that handles case preservation */
 function createCaseHandler(preserveCase: boolean) {
-  return function (emoticons: RegExp) {
+  return (emoticons: RegExp) => {
     return memoize((str: string) => (emoticons.test(str) ? str : preserveCase ? str : str.toLowerCase()));
   };
 }
