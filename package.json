@@ -96,6 +96,6 @@
   },
   "homepage": "https://github.com/phugh/happynodetokenizer",
   "dependencies": {
-    "core-js": "^3.18.0"
+    "core-js": "^3.26.1"
   }
 }
