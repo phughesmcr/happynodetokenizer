@@ -1,16 +1,6 @@
 /** Tokenizer options object handling. */
 
-const MODE_PATTERN = /dlatk|stanford/;
-const NORM_PATTERN = /NFK?(C|D)/;
-
-export interface TokenizerOptions {
-  /** Defaults to "stanford" */
-  mode?: "stanford" | "dlatk";
-  /** Defaults to `undefined` */
-  normalize?: "NFC" | "NFD" | "NFKC" | "NFKD" | null;
-  /** Defaults to `true` */
-  preserveCase?: boolean;
-}
+import { MODE_PATTERN, NORM_PATTERN } from "./constants.js";
 
 export function normalizeOpts(opts: TokenizerOptions): Required<TokenizerOptions> {
   const { mode = "stanford", normalize = null, preserveCase = true } = opts;
