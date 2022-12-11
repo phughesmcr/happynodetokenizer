@@ -81,10 +81,11 @@ const syncTests = (opts) => {
 
 const main = () => {
   console.log('\nStarting Stanford mode tests...\n');
-  syncTests({preserveCase: false});
+  syncTests({ preserveCase: false });
   console.log('Stanford mode tests finished.\n');
+
   console.log('Starting DLATK mode tests...\n');
-  syncTests({mode: 'dlatk', preserveCase: false});
+  syncTests({ mode: 'dlatk', preserveCase: false });
   console.log('DLATK mode tests finished.');
 };
 main();
