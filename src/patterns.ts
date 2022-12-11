@@ -7,7 +7,6 @@
  * the Stanford and DLATK regexps, in the "Remaining" item:
  * accentedChars = \u00C0-\u00FF
  */
-"use strict";
 
 //#region Stanford
 export const stanfordPhoneNumbers = /(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/;

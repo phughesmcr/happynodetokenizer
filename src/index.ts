@@ -50,7 +50,6 @@
  *  const values = Array.from(tokens, (token) => token.value); // turn array of tokens into array of strings
  *  console.log(values); // ["a", "big", "long", "string", "of", "text", "..."]
  */
-"use strict";
 
 export type { Token } from "./tokenizer";
 export { tokenizer } from "./tokenizer";

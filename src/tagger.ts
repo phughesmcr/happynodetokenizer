@@ -1,5 +1,4 @@
 /** Token type tagger */
-"use strict";
 
 import { memoize } from "./utils";
 import {

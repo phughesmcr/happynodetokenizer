@@ -1,5 +1,4 @@
 /** String cleaning */
-"use strict";
 
 import * as he from "he";
 import { pipe } from "./utils";

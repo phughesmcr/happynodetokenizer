@@ -1,5 +1,4 @@
 /** Tokenizer options object handling. */
-"use strict";
 
 const MODE_PATTERN = /dlatk|stanford/;
 const NORM_PATTERN = /NFK?(C|D)/;

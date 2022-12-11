@@ -1,5 +1,4 @@
 /** String tokenizer */
-"use strict";
 
 import { normalizeOpts, TokenizerOptions } from "./options";
 import { dlatkEmoticons, dlatkTokenizerPattern, stanfordEmoticons, stanfordTokenizerPattern } from "./patterns";
