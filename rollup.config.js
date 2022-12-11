@@ -4,21 +4,22 @@ import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import dts from "rollup-plugin-dts";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
-import * as pkg from "./package.json";
 import typescript from "@rollup/plugin-typescript";
 import { DEFAULT_EXTENSIONS } from "@babel/core";
 import { terser } from "rollup-plugin-terser";
 
-const pkgName = pkg.name;
-const extensions = [...DEFAULT_EXTENSIONS, ".ts", ".tsx"];
-const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
+const pkgName = "HappyNodeTokenizer";
+const pkgVersion = "6.0.0";
+
+const extensions = [...DEFAULT_EXTENSIONS, ".ts"];
 const globals = {};
 const bannerText =
 `/*! *****************************************************************************
  *
- * ${pkgName}
- * v${pkg.version}
- * license ${pkg.license}
+ * @name ${pkgName}
+ * @version ${pkg}
+ * @author Peter Hughes<github@phugh.es>(www.phugh.es)
+ * @license CC-BY-NC-SA-3.0
  *
  ***************************************************************************** */\n`;
 
@@ -28,8 +29,6 @@ export default [
   // ESM
   {
     input,
-
-    external,
 
     plugins: [
       nodeResolve({
@@ -47,8 +46,6 @@ export default [
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         module: "ES2020",
         tsconfig: "tsconfig.json",
-        tslib: require("tslib"),
-        typescript: require("typescript"),
       }),
 
       babel({
@@ -82,8 +79,6 @@ export default [
   {
     input,
 
-    external,
-
     plugins: [
       nodeResolve({
         extensions,
@@ -99,8 +94,6 @@ export default [
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
-        tslib: require("tslib"),
-        typescript: require("typescript"),
       }),
 
       babel({
@@ -133,8 +126,6 @@ export default [
   {
     input,
 
-    external,
-
     plugins: [
       nodeResolve({
         extensions,
@@ -148,8 +139,6 @@ export default [
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
-        tslib: require("tslib"),
-        typescript: require("typescript"),
       }),
 
       babel({
