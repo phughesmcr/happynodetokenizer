@@ -46,7 +46,7 @@
  *      "preserveCase": true,
  *  };
  *  const tkn = tokenizer(ops); // (input: string) => Token[];
- *  const tokens = tkn(text);   // Token[];
+ *  const tokens = tkn(text);   // Token[] generator;
  *  const values = Array.from(tokens, (token) => token.value); // turn array of tokens into array of strings
  *  console.log(values); // ["a", "big", "long", "string", "of", "text", "..."]
  */
