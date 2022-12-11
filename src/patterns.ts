@@ -29,7 +29,7 @@ export const stanfordTokenizerPattern = new RegExp(
     stanfordHashtags.source +
     "|" +
     stanfordRemaining.source,
-  "gi"
+  "giu"
 );
 //#endregion Stanford
 
@@ -68,6 +68,6 @@ export const dlatkTokenizerPattern = new RegExp(
     dlatkHashtags.source +
     "|" +
     dlatkRemaining.source,
-  "gi"
+  "giu"
 );
 //#endregion DLATK
