@@ -51,5 +51,5 @@
  *  console.log(values); // ["a", "big", "long", "string", "of", "text", "..."]
  */
 
-export type { Token } from "./tokenizer";
+export type { Token } from "./types.js";
 export { tokenizer } from "./tokenizer";

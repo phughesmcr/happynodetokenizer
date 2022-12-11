@@ -18,7 +18,7 @@ import {
   stanfordPhoneNumbers,
   stanfordRemaining,
   stanfordTwitterUsernames,
-} from "./patterns";
+import type { TokenizerMode } from "./types.js";
 
 const TAG_PATTERN = /[a-zA-Z]{2,}/g;
 const WORD_PATTERN = /\w/;
@@ -79,6 +79,6 @@ function getStanfordTag(token: string): string {
   }
 }
 
-export function createTagger(mode: "stanford" | "dlatk"): (str: string) => string {
+export function createTagger(mode: TokenizerMode): (str: string) => string {
   return mode === "dlatk" ? memoize<string, string>(getDlatkTag) : memoize<string, string>(getStanfordTag);
 }

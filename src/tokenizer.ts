@@ -1,19 +1,6 @@
 /** String tokenizer */
 
-import { normalizeOpts, TokenizerOptions } from "./options";
-import { dlatkEmoticons, dlatkTokenizerPattern, stanfordEmoticons, stanfordTokenizerPattern } from "./patterns";
-import { htmlToUnicode, normalizeStr, removeHex } from "./strings";
-import { createTagger } from "./tagger";
-import { memoize, noop, pipe } from "./utils";
-
-export type Token = {
-  /** The token's line offset (begins at 0) */
-  offset: number;
-  /** The token's type (e.g., "punct" for punctuation) */
-  tag: string;
-  /** The token itself */
-  value: string;
-};
+import type { TokenizerMode, TokenMatchData, TokenizerNormalization, TokenizerOptions, Token } from "./types.js";
 
 /** Creates a function that handles case preservation */
 function createCaseHandler(preserveCase: boolean) {
@@ -23,7 +10,7 @@ function createCaseHandler(preserveCase: boolean) {
 }
 
 /** Creates a function that returns an array of all RegExp matches */
-function createMatcher(mode: "stanford" | "dlatk") {
+function createMatcher(mode: TokenizerMode): (str: string) => Generator<TokenMatchData, void, unknown> {
   const pattern = mode === "dlatk" ? dlatkTokenizerPattern : stanfordTokenizerPattern;
   return function* (str: string) {
     pattern.lastIndex = 0;
@@ -39,12 +26,12 @@ function createMatcher(mode: "stanford" | "dlatk") {
 }
 
 /** Creates a function that will normalize a string if a valid form is given */
-function createNormalizer(form?: "NFC" | "NFD" | "NFKC" | "NFKD" | null): (str: string) => string {
+function createNormalizer(form?: TokenizerNormalization): (str: string) => string {
   return form ? normalizeStr(form) : noop;
 }
 
 /** Creates a function that replaces hex codes in dlatk mode */
-function createHexReplacer(mode: "stanford" | "dlatk"): (str: string) => string {
+function createHexReplacer(mode: TokenizerMode): (str: string) => string {
   return mode === "dlatk" ? removeHex : noop;
 }
 

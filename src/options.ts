@@ -1,6 +1,7 @@
 /** Tokenizer options object handling. */
 
 import { MODE_PATTERN, NORM_PATTERN } from "./constants.js";
+import type { TokenizerOptions, TokenizerMode, TokenizerNormalization } from "./types.js";
 
 export function normalizeOpts(opts: TokenizerOptions): Required<TokenizerOptions> {
   const { mode = "stanford", normalize = null, preserveCase = true } = opts;
@@ -18,8 +19,8 @@ export function normalizeOpts(opts: TokenizerOptions): Required<TokenizerOptions
   }
 
   return {
-    mode: typeof mode !== "string" ? "stanford" : (_mode as "stanford" | "dlatk"),
-    normalize: typeof normalize !== "string" ? null : (_normalize as "NFC" | "NFD" | "NFKC" | "NFKD"),
+    mode: typeof mode !== "string" ? "stanford" : (_mode as TokenizerMode),
+    normalize: typeof normalize !== "string" ? null : (_normalize as TokenizerNormalization),
     preserveCase: Boolean(preserveCase),
   };
 }
