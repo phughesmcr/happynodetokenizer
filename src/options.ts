@@ -21,6 +21,6 @@ export function normalizeOpts(opts: TokenizerOptions): Required<TokenizerOptions
   return {
     mode: typeof mode !== "string" ? "stanford" : (_mode as TokenizerMode),
     normalize: typeof normalize !== "string" ? null : (_normalize as TokenizerNormalization),
-    preserveCase: Boolean(preserveCase),
+    preserveCase: !!preserveCase,
   };
 }
