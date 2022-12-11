@@ -30,7 +30,11 @@ function createMatcher(mode: "stanford" | "dlatk") {
     pattern.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = pattern.exec(str))) {
-      yield m;
+      yield {
+        match: m,
+        start: pattern.lastIndex - m[0].length,
+        end: pattern.lastIndex - 1,
+      };
     }
   };
 }
@@ -81,10 +85,11 @@ export function tokenizer(opts: TokenizerOptions = {}): (input: string) => () =>
   return function (input: string) {
     const matches = match(cleaner(input));
     return function* () {
-      for (const match of matches) {
+      for (const { match, start, end } of matches) {
         const value = handleCase(match[0]);
         const token: Token = {
-          offset: match.index,
+          end,
+          start,
           tag: tag(value),
           value,
         };
