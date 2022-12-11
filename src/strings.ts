@@ -1,7 +1,7 @@
 /** String cleaning */
 
 import * as he from "he";
-import { pipe } from "./utils";
+import { pipe } from "./utils.js";
 
 const HEX_PATTERN = /\\x[0-9a-z]{1,4}/g;
 const HTML_DIGIT_PATTERN = /&#\d+;/g;

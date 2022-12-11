@@ -52,4 +52,4 @@
  */
 
 export type { Token } from "./types.js";
-export { tokenizer } from "./tokenizer";
+export { tokenizer } from "./tokenizer.js";

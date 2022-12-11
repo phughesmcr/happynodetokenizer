@@ -1,6 +1,6 @@
 /** Token type tagger */
 
-import { memoize } from "./utils";
+import { memoize } from "./utils.js";
 import {
   dlatkPhoneNumbers,
   dlatkWebAddressFull,
@@ -18,6 +18,7 @@ import {
   stanfordPhoneNumbers,
   stanfordRemaining,
   stanfordTwitterUsernames,
+} from "./patterns.js";
 import type { TokenizerMode } from "./types.js";
 
 const TAG_PATTERN = /[a-zA-Z]{2,}/g;

@@ -1,5 +1,10 @@
 /** String tokenizer */
 
+import { normalizeOpts } from "./options.js";
+import { dlatkEmoticons, dlatkTokenizerPattern, stanfordEmoticons, stanfordTokenizerPattern } from "./patterns.js";
+import { htmlToUnicode, normalizeStr, removeHex } from "./strings.js";
+import { createTagger } from "./tagger.js";
+import { memoize, noop, pipe } from "./utils.js";
 import type { TokenizerMode, TokenMatchData, TokenizerNormalization, TokenizerOptions, Token } from "./types.js";
 
 /** Creates a function that handles case preservation */
