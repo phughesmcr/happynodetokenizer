@@ -5,6 +5,7 @@ A basic Twitter aware tokenizer for Javascript environments.
 A Typescript port of [HappyFunTokenizer.py](https://github.com/stanfordnlp/python-stanford-corenlp/blob/master/tests/happyfuntokenizer.py) by Christopher Potts and  [HappierFunTokenizing.py](https://github.com/dlatk/happierfuntokenizing) by H. Andrew Schwartz.
 
 ## Features
+* Accurate port of both libraries (run `npm run test`)
 * Typescript definitions
 * Uses generators / memoize for efficiency
 * Customizable and easy to use
@@ -53,17 +54,17 @@ The `tokens` variable in the above example will look like this:
 
 ```javascript
 [
-  { idx: 0, value: 'rt', tag: 'word' },
-  { idx: 1, value: '@', tag: 'punct' },
-  { idx: 2, value: '#happyfuncoding', tag: 'hashtag' },
-  { idx: 3, value: ':', tag: 'punct' },
-  { idx: 4, value: 'this', tag: 'word' },
-  { idx: 5, value: 'is', tag: 'word' },
-  { idx: 6, value: 'a', tag: 'word' },
-  { idx: 7, value: 'typical', tag: 'word' },
-  { idx: 8, value: 'twitter', tag: 'word' },
-  { idx: 9, value: 'tweet', tag: 'word' },
-  { idx: 10, value: ':-)', tag: 'emoticon' }
+  { end: 1, start: 0, tag: 'word', value: 'rt' },
+  { end: 3, start: 3, tag: 'punct', value: '@' },
+  { end: 19, start: 5, tag: 'hashtag', value: '#happyfuncoding' },
+  { end: 20, start: 20, tag: 'punct', value: ':' },
+  { end: 25, start: 22, tag: 'word', value: 'this' },
+  { end: 28, start: 27, tag: 'word', value: 'is' },
+  { end: 30, start: 30, tag: 'word', value: 'a' },
+  { end: 38, start: 32, tag: 'word', value: 'typical' },
+  { end: 46, start: 40, tag: 'word', value: 'twitter' },
+  { end: 52, start: 48, tag: 'word', value: 'tweet' },
+  { end: 56, start: 54, tag: 'emoticon', value: ':-)' }
 ]
 ```
 
@@ -95,7 +96,7 @@ Normalization is disabled with set to null or undefined (default).
 ### preserveCase
 **boolean - valid options: `true`, or `false` (default)**
 
-Preserves the case of the input string. Does not affect emoticons.
+Preserves the case of the input string if true, otherwise all tokens are converted to lowercase. Does not affect emoticons.
 
 ## Tags
 HappyNodeTokenizer outputs an array of token objects. Each token object has three properties: `idx`, `value` and `tag`. The `value` is the token itself, the `idx` is the token's original index in the output, the `tag` is a descriptor based on one of the following depending on which `opt.mode` you are using:
