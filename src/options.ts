@@ -9,13 +9,9 @@ export function normalizeOpts(opts: TokenizerOptions): Required<TokenizerOptions
   const _mode = mode.toLowerCase();
   const _normalize = normalize?.toUpperCase() ?? null;
 
-  if (!MODE_PATTERN.exec(_mode)) {
-    throw new SyntaxError(`Tokenizer "mode" must be "stanford" or "dlatk". Found "${mode}".`);
-  }
+  if (!MODE_PATTERN.exec(_mode)) throw new SyntaxError(`"mode" must be "stanford" or "dlatk". Found "${mode}".`);
   if (normalize && !NORM_PATTERN.exec(normalize)) {
-    throw new SyntaxError(
-      `Tokenizer "normalize" option must be null | undefined | 'NFC' | 'NFD' | 'NFKC' | 'NFKD'. Found "${normalize}".`
-    );
+    throw new SyntaxError(`"normalize" option must be 'NFC' | 'NFD' | 'NFKC' | 'NFKD'. Found "${normalize}".`);
   }
 
   return {
