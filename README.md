@@ -128,6 +128,6 @@ Based on [HappyFunTokenizer.py](https://github.com/stanfordnlp/python-stanford-c
 Uses the ["he" library](https://github.com/mathiasbynens/he) by Mathias Bynens under the MIT license.
 
 ## License
-(C) 2017-21 [P. Hughes](https://www.phugh.es). All rights reserved.
+(C) 2017-22 [P. Hughes](https://www.phugh.es). All rights reserved.
 
 Shared under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) license.

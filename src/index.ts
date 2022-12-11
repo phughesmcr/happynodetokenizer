@@ -19,7 +19,7 @@
  * @version      5.0.2
  * @exports      tokenize
  * @author       P. Hughes <peter@phugh.es> (https://www.phugh.es)
- * @copyright    2017-21 P. Hughes. All rights reserved.
+ * @copyright    2017-22 P. Hughes. All rights reserved.
  * @license      CC-BY-NC-SA-3.0
  *
  * Default options (opts):
