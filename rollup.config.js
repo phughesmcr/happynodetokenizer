@@ -4,22 +4,26 @@ import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import dts from "rollup-plugin-dts";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
-import typescript from "@rollup/plugin-typescript";
+import typescript from 'rollup-plugin-typescript2';
 import { DEFAULT_EXTENSIONS } from "@babel/core";
 import { terser } from "rollup-plugin-terser";
 
-const pkgName = "HappyNodeTokenizer";
-const pkgVersion = "6.0.0";
+const NAME = process.env.npm_package_name;
+const VERSION = process.env.npm_package_version;
+const LICENSE = process.env.npm_package_license;
+const CURRENT_YEAR = new Date().getFullYear();
 
 const extensions = [...DEFAULT_EXTENSIONS, ".ts"];
 const globals = {};
 const bannerText =
 `/*! *****************************************************************************
  *
- * @name ${pkgName}
- * @version ${pkgVersion}
+ * HappyNodeTokenizer
+ * @name ${NAME}
+ * @version ${VERSION}
  * @author Peter Hughes<github@phugh.es>(www.phugh.es)
- * @license CC-BY-NC-SA-3.0
+ * @license ${LICENSE}
+ * @copyright 2018-${CURRENT_YEAR}. All rights reserved.
  *
  ***************************************************************************** */\n`;
 
@@ -46,6 +50,8 @@ export default [
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         module: "ES2020",
         tsconfig: "tsconfig.json",
+        tsconfigOverride: { declaration: false },
+        useTsconfigDeclarationDir: true,
       }),
 
       babel({
@@ -94,6 +100,8 @@ export default [
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
+        tsconfigOverride: { declaration: false },
+        useTsconfigDeclarationDir: true,
       }),
 
       babel({
@@ -116,7 +124,7 @@ export default [
       exports: "named",
       file: "./dist/cjs/index.min.js",
       format: "cjs",
-      name: pkgName,
+      name: NAME,
       sourcemap: true,
       globals,
     },
@@ -139,6 +147,8 @@ export default [
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
+        tsconfigOverride: { declaration: false },
+        useTsconfigDeclarationDir: true,
       }),
 
       babel({
@@ -162,7 +172,7 @@ export default [
         exports: "named",
         file: "./dist/umd/index.min.js",
         format: "umd",
-        name: pkgName,
+        name: NAME,
         noConflict: true,
         sourcemap: true,
         globals,
@@ -173,7 +183,7 @@ export default [
         exports: "named",
         file: "./dist/iife/index.min.js",
         format: "iife",
-        name: pkgName,
+        name: NAME,
         sourcemap: true,
         globals,
       }
