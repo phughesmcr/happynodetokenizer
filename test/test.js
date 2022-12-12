@@ -68,8 +68,8 @@ const syncTests = (opts) => {
   const tokenize = tokenizer(opts);
   const results = [];
   for (const str of testStrings) {
-    const res = tokenize(str, opts);
-    results.push(Array.from(res, (m) => m.value));
+    const res = [...tokenize(str, opts)()];
+    results.push(Array.from(res, (t) => t.value));
   }
   const errors = compareResults(results, opts);
   if (errors > 0) {
