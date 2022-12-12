@@ -1,20 +1,26 @@
+type TokenizerMode = "stanford" | "dlatk";
+type TokenizerNormalization = "NFC" | "NFD" | "NFKC" | "NFKD" | null;
 interface TokenizerOptions {
     /** Defaults to "stanford" */
-    mode?: "stanford" | "dlatk";
+    mode?: TokenizerMode;
     /** Defaults to `undefined` */
-    normalize?: "NFC" | "NFD" | "NFKC" | "NFKD" | null;
+    normalize?: TokenizerNormalization;
     /** Defaults to `true` */
     preserveCase?: boolean;
 }
-
-declare type Token = {
-    /** The token's line offset (begins at 0) */
-    offset: number;
+type Token = {
+    /** The end position of the match. 0 based. */
+    end: number;
+    /** The starting position of the match. 0 based. */
+    start: number;
     /** The token's type (e.g., "punct" for punctuation) */
     tag: string;
     /** The token itself */
     value: string;
 };
+
+/** String tokenizer */
+
 /**
  * Create a tokenizer with a given set of options configured
  * @param opts optional tokenizer options
