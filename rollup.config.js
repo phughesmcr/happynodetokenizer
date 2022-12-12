@@ -17,7 +17,7 @@ const bannerText =
 `/*! *****************************************************************************
  *
  * @name ${pkgName}
- * @version ${pkg}
+ * @version ${pkgVersion}
  * @author Peter Hughes<github@phugh.es>(www.phugh.es)
  * @license CC-BY-NC-SA-3.0
  *
