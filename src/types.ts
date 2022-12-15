@@ -1,10 +1,27 @@
+export type Tokenizer = (input: string) => () => Generator<Token, void, unknown>;
+
+export type TokenizerTag =
+  | "phone"
+  | "url"
+  | "url_scheme"
+  | "url_authority"
+  | "url_path_query"
+  | "htmltag"
+  | "emoticon"
+  | "username"
+  | "hashtag"
+  | "word"
+  | "punct"
+  | "<UNK>";
+
 export type TokenizerMode = "stanford" | "dlatk";
+
 export type TokenizerNormalization = "NFC" | "NFD" | "NFKC" | "NFKD" | null;
 
 export interface TokenizerOptions {
   /** Defaults to "stanford" */
   mode?: TokenizerMode;
-  /** Defaults to `undefined` */
+  /** Defaults to `null` */
   normalize?: TokenizerNormalization;
   /** Defaults to `true` */
   preserveCase?: boolean;

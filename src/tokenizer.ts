@@ -5,7 +5,15 @@ import { dlatkEmoticons, dlatkTokenizerPattern, stanfordEmoticons, stanfordToken
 import { htmlToUnicode, normalizeStr, removeHex } from "./strings.js";
 import { createTagger } from "./tagger.js";
 import { memoize, noop, pipe } from "./utils.js";
-import type { TokenizerMode, TokenMatchData, TokenizerNormalization, TokenizerOptions, Token } from "./types.js";
+import type {
+  TokenizerMode,
+  TokenMatchData,
+  TokenizerNormalization,
+  TokenizerOptions,
+  Token,
+  Tokenizer,
+} from "./types.js";
+import { DEFAULT_OPTS, DLATK } from "./constants.js";
 
 /** Creates a function that handles case preservation */
 function createCaseHandler(preserveCase: boolean) {
@@ -16,7 +24,7 @@ function createCaseHandler(preserveCase: boolean) {
 
 /** Creates a function that returns an array of all RegExp matches */
 function createMatcher(mode: TokenizerMode): (str: string) => Generator<TokenMatchData, void, unknown> {
-  const pattern = mode === "dlatk" ? dlatkTokenizerPattern : stanfordTokenizerPattern;
+  const pattern = mode === DLATK ? dlatkTokenizerPattern : stanfordTokenizerPattern;
   return function* (str: string) {
     pattern.lastIndex = 0;
     let m: RegExpExecArray | null;
@@ -37,7 +45,7 @@ function createNormalizer(form?: TokenizerNormalization): (str: string) => strin
 
 /** Creates a function that replaces hex codes in dlatk mode */
 function createHexReplacer(mode: TokenizerMode): (str: string) => string {
-  return mode === "dlatk" ? removeHex : noop;
+  return mode === DLATK ? removeHex : noop;
 }
 
 /** Avoid mutating the original string by creating a copy */
@@ -55,12 +63,12 @@ function isString(str: string): string {
  * Create a tokenizer with a given set of options configured
  * @param opts optional tokenizer options
  * @param opts.mode Tokenization mode, "stanford" | "dlatk". Defaults to "stanford".
- * @param opts.normalize Normalization form, disabled if undefined | null. Available options: "NFC" | "NFD" | "NFKC" | "NFKD". Defaults to undefined.
+ * @param opts.normalize Normalization form, disabled if null. Available options: "NFC" | "NFD" | "NFKC" | "NFKD". Defaults to null.
  * @param opts.preserveCase Preserve the tokens' case; does not affect emoticons. Defaults to `true`.
  * @returns the tokenizer function
  */
-export function tokenizer(opts: TokenizerOptions = {}): (input: string) => () => Generator<Token, void, unknown> {
-  const { mode, normalize, preserveCase } = normalizeOpts({ ...opts });
+export function tokenizer(opts: TokenizerOptions = DEFAULT_OPTS): Tokenizer {
+  const { mode, normalize, preserveCase } = normalizeOpts(opts);
 
   // string cleaning functions
   const replaceHex = createHexReplacer(mode);
@@ -70,7 +78,7 @@ export function tokenizer(opts: TokenizerOptions = {}): (input: string) => () =>
   const match = createMatcher(mode);
   const tag = createTagger(mode);
   // case handling
-  const emoticons = mode === "dlatk" ? dlatkEmoticons : stanfordEmoticons;
+  const emoticons = mode === DLATK ? dlatkEmoticons : stanfordEmoticons;
   const handleCase = createCaseHandler(preserveCase)(emoticons);
 
   return function (input: string) {

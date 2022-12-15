@@ -1,15 +1,32 @@
 /** Tokenizer options object handling. */
 
-import { MODE_PATTERN, NORM_PATTERN } from "./constants.js";
+import {
+  DEFAULT_MODE,
+  DEFAULT_NORMALIZE,
+  DEFAULT_OPTS,
+  DEFAULT_PRESERVE_CASE,
+  DLATK,
+  MODE_PATTERN,
+  NORM_PATTERN,
+  STANFORD,
+} from "./constants.js";
 import type { TokenizerOptions, TokenizerMode, TokenizerNormalization } from "./types.js";
 
 export function normalizeOpts(opts: TokenizerOptions): Required<TokenizerOptions> {
-  const { mode = "stanford", normalize = null, preserveCase = true } = opts;
+  const {
+    mode = DEFAULT_MODE,
+    normalize = DEFAULT_NORMALIZE,
+    preserveCase = DEFAULT_PRESERVE_CASE,
+  } = { ...DEFAULT_OPTS, ...opts };
 
   if (typeof mode !== "string") {
     throw new TypeError(`"mode" must be a string. Found "${typeof mode}".`);
   }
   const _mode = mode.toLowerCase();
+  if (!MODE_PATTERN.exec(_mode)) {
+    throw new SyntaxError(`"mode" must be "${STANFORD}" or "${DLATK}". Found "${mode}".`);
+  }
+
   if (normalize && typeof normalize !== "string") {
     throw new TypeError(`"normalize" must be a string. Found "${typeof normalize}".`);
   }
