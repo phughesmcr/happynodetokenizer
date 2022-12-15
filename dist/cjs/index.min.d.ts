@@ -1,9 +1,10 @@
+type Tokenizer = (input: string) => () => Generator<Token, void, unknown>;
 type TokenizerMode = "stanford" | "dlatk";
 type TokenizerNormalization = "NFC" | "NFD" | "NFKC" | "NFKD" | null;
 interface TokenizerOptions {
     /** Defaults to "stanford" */
     mode?: TokenizerMode;
-    /** Defaults to `undefined` */
+    /** Defaults to `null` */
     normalize?: TokenizerNormalization;
     /** Defaults to `true` */
     preserveCase?: boolean;
@@ -17,6 +18,11 @@ type Token = {
     tag: string;
     /** The token itself */
     value: string;
+    /**
+     * Only present when preserveCase === true.
+     * The token's original value as matched, without any case modification.
+     */
+    variation?: string;
 };
 
 /** String tokenizer */
@@ -25,10 +31,10 @@ type Token = {
  * Create a tokenizer with a given set of options configured
  * @param opts optional tokenizer options
  * @param opts.mode Tokenization mode, "stanford" | "dlatk". Defaults to "stanford".
- * @param opts.normalize Normalization form, disabled if undefined | null. Available options: "NFC" | "NFD" | "NFKC" | "NFKD". Defaults to undefined.
+ * @param opts.normalize Normalization form, disabled if null. Available options: "NFC" | "NFD" | "NFKC" | "NFKD". Defaults to null.
  * @param opts.preserveCase Preserve the tokens' case; does not affect emoticons. Defaults to `true`.
  * @returns the tokenizer function
  */
-declare function tokenizer(opts?: TokenizerOptions): (input: string) => () => Generator<Token, void, unknown>;
+declare function tokenizer(opts?: TokenizerOptions): Tokenizer;
 
 export { Token, tokenizer };
