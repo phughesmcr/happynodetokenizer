@@ -1,13 +1,15 @@
 {
   "presets": [
     ["@babel/preset-env", {
+      "modules": false,
       "targets": ">0.25%, not ie 11, not ie_mob 11, not op_mini all",
       "bugfixes": true,
       "corejs": {
         "version": "3.26",
         "proposals": true
       },
-      "useBuiltIns": "usage"
+      "useBuiltIns": "usage",
+      "forceAllTransforms": true
     }],
     "@babel/preset-typescript"
   ]

@@ -1,5 +1,3 @@
-"use strict";
-
 import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import dts from "rollup-plugin-dts";
@@ -7,23 +5,25 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from 'rollup-plugin-typescript2';
 import { DEFAULT_EXTENSIONS } from "@babel/core";
 import { terser } from "rollup-plugin-terser";
+import replace from '@rollup/plugin-replace';
 
 const NAME = process.env.npm_package_name;
 const VERSION = process.env.npm_package_version;
-const LICENSE = process.env.npm_package_license;
+const LICENSE = "CC-BY-NC-SA-3.0";
 const CURRENT_YEAR = new Date().getFullYear();
 
 const extensions = [...DEFAULT_EXTENSIONS, ".ts"];
+const externals = { "he": "he "};
 const globals = {};
 const bannerText =
 `/*! *****************************************************************************
  *
- * HappyNodeTokenizer
  * @name ${NAME}
  * @version ${VERSION}
  * @author Peter Hughes<github@phugh.es>(www.phugh.es)
  * @license ${LICENSE}
- * @copyright 2018-${CURRENT_YEAR}. All rights reserved.
+ * @copyright 2017-${CURRENT_YEAR}. All rights reserved.
+ * Uses the "he" library by Mathias Bynens under the MIT license.
  *
  ***************************************************************************** */\n`;
 
@@ -35,6 +35,14 @@ export default [
     input,
 
     plugins: [
+      replace({
+        exclude: 'node_modules/**',
+        values: {
+          __VERSION__: VERSION,
+        },
+        preventAssignment: true,
+      }),
+
       nodeResolve({
         extensions,
         mainFields: ["module", "main"],
@@ -46,6 +54,7 @@ export default [
       }),
 
       typescript({
+        clean: true,
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         module: "ES2020",
@@ -62,7 +71,6 @@ export default [
       }),
 
       terser({
-        safari10: true,
         ecma: 2020,
         module: true,
         compress: true,
@@ -97,6 +105,7 @@ export default [
       }),
 
       typescript({
+        clean: true,
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
@@ -113,6 +122,7 @@ export default [
 
       terser({
         ecma: 2020,
+        module: false,
         compress: true,
         mangle: true,
       }),
@@ -144,6 +154,7 @@ export default [
       commonjs({ include: "node_modules/**" }),
 
       typescript({
+        clean: true,
         exclude: [ "node_modules", "*.d.ts", "**/*.d.ts" ],
         include: [ "*.ts+(|x)", "**/*.ts+(|x)", "*.m?js+(|x)", "**/*.m?js+(|x)" ],
         tsconfig: "tsconfig.json",
@@ -159,7 +170,9 @@ export default [
       }),
 
       terser({
+        safari10: true,
         ecma: 2020,
+        module: false,
         compress: true,
         mangle: true,
       }),
