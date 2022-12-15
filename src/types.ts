@@ -19,6 +19,11 @@ export type Token = {
   tag: string;
   /** The token itself */
   value: string;
+  /**
+   * Only present when preserveCase === true.
+   * The token's original value as matched, without any case modification.
+   */
+  variation?: string;
 };
 
 export type TokenMatchData = {

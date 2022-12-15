@@ -77,13 +77,17 @@ export function tokenizer(opts: TokenizerOptions = {}): (input: string) => () =>
     const matches = match(cleaner(input));
     return function* () {
       for (const { match, start, end } of matches) {
-        const value = handleCase(match[0]);
+        const orig = match[0];
+        const value = handleCase(orig);
         const token: Token = {
           end,
           start,
           tag: tag(value),
           value,
         };
+        if (value !== orig) {
+          token.variation = orig;
+        }
         yield token;
       }
     };
