@@ -68,6 +68,19 @@ The `tokens` variable in the above example will look like this:
 ]
 ```
 
+Where `preserveCase` in the Options Object is `false`, each result object may also contain a `variation` property which presents the token as originally matched if it differs from the `value` property. E.g.:
+
+```javascript
+[
+  { end: 1, start: 0, tag: 'word', value: 'rt', variation: 'RT' },
+  { end: 3, start: 3, tag: 'punct', value: '@' },
+  { end: 19, start: 5, tag: 'hashtag', value: '#happyfuncoding' },
+  ...
+  { end: 46, start: 40, tag: 'word', value: 'twitter', variation: 'Twitter' },
+  ...
+]
+```
+
 ## The Options Object
 The options object and its properties are optional. The defaults are:
 
