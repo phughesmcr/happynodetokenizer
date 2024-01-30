@@ -9,23 +9,19 @@ A Typescript port of [HappyFunTokenizer.py](https://github.com/stanfordnlp/pytho
 * Typescript definitions
 * Uses generators / memoize for efficiency
 * Customizable and easy to use
-* Compiled with Babel for extensive browser/environment support
 
 ## Install
 ```bash
   npm install --save happynodetokenizer
 ```
 
-`UMD`, `IIFE`, `CJS` and `ESM` builds are available in the `./dist` directory.
-
 ## Usage
-HappyNodeTokenizer exposes a function called `tokenizer()` which takes an optional configuration object *(See "The Options Object" below)*.
+HappyNodeTokenizer exports a function called `tokenizer()` which takes an optional configuration object *(See "The Options Object" below)*.
 
 
 ### Example
 ```javascript
 import { tokenizer } from 'happynodetokenizer';
-// or: const tokenizer = require('happynodetokenizer');
 
 const text = 'RT @ #happyfuncoding: this is a typical Twitter tweet :-)';
 
@@ -142,6 +138,6 @@ Based on [HappyFunTokenizer.py](https://github.com/stanfordnlp/python-stanford-c
 Uses the ["he" library](https://github.com/mathiasbynens/he) by Mathias Bynens under the MIT license.
 
 ## License
-(C) 2017-22 [P. Hughes](https://www.phugh.es). All rights reserved.
+(C) 2017-24 [P. Hughes](https://www.phugh.es). All rights reserved.
 
 Shared under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-nc-sa/3.0/) license.
