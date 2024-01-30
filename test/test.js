@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 'use strict';
-import { tokenizer } from '../dist/esm/index.min.js';
+import { tokenizer } from '../build/index.js';
 
 /**
  * Input strings

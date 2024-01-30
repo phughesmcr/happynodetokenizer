@@ -1,49 +1,107 @@
-import { TokenizerMode, TokenizerNormalization, TokenizerOptions } from "./types.js";
+import { PatternContainer, TokenizerNormalizationForm, TokenizerOptions } from "./types.js";
 
-export const STANFORD = "stanford";
+export class UTIL_PATTERNS {
+  static HTMLTAG = /[a-zA-Z]{2,}/g;
+  static MODE = /dlatk|stanford/;
+  static NORM = /NFK?(C|D)/;
+  static WORD = /\w/;
+}
 
-export const DLATK = "dlatk";
+export const enum TOKENIZER_MODE {
+  "STANFORD" = "stanford",
+  "DLATK" = "dlatk",
+}
 
-export const PHONE_TAG = "phone";
+export const enum TOKEN_TAG {
+  PHONE = "phone",
+  URL = "url",
+  URL_SCHEME = "url_scheme",
+  URL_AUTHORITY = "url_authority",
+  URL_PATH_QUERY = "url_path_query",
+  HTMLTAG = "htmltag",
+  EMOTICON = "emoticon",
+  USERNAME = "username",
+  HASHTAG = "hashtag",
+  WORD = "word",
+  PUNCTUATION = "punct",
+  UNKNOWN = "<UNK>",
+}
 
-export const URL_TAG = "url";
+export const enum NORMALIZATION_FORM {
+  "NFC" = "NFC",
+  "NFD" = "NFD",
+  "NFKC" = "NFKC",
+  "NFKD" = "NFKD",
+}
 
-export const URL_SCHEME_TAG = "url_scheme";
-
-export const URL_AUTHORITY_TAG = "url_authority";
-
-export const URL_PATH_QUERY_TAG = "url_path_query";
-
-export const HTMLTAG_TAG = "htmltag";
-
-export const EMOTICON_TAG = "emoticon";
-
-export const USERNAME_TAG = "username";
-
-export const HASHTAG_TAG = "hashtag";
-
-export const WORD_TAG = "word";
-
-export const PUNCT_TAG = "punct";
-
-export const UNK_TAG = "<UNK>";
-
-export const HTMLTAG_PATTERN = /[a-zA-Z]{2,}/g;
-
-export const WORD_PATTERN = /\w/;
-
-export const MODE_PATTERN = /dlatk|stanford/;
-
-export const NORM_PATTERN = /NFK?(C|D)/;
-
-export const DEFAULT_MODE: TokenizerMode = STANFORD;
-
-export const DEFAULT_NORMALIZE: TokenizerNormalization = null;
-
-export const DEFAULT_PRESERVE_CASE = true;
+export class DEFAULTS {
+  static MODE: TOKENIZER_MODE = TOKENIZER_MODE.STANFORD;
+  static NORMALIZE: TokenizerNormalizationForm = null;
+  static PRESERVE_CASE = true;
+}
 
 export const DEFAULT_OPTS: Readonly<TokenizerOptions> = Object.freeze({
-  mode: DEFAULT_MODE,
-  normalize: DEFAULT_NORMALIZE,
-  preserveCase: DEFAULT_PRESERVE_CASE,
+  mode: DEFAULTS.MODE,
+  normalize: DEFAULTS.NORMALIZE,
+  preserveCase: DEFAULTS.PRESERVE_CASE,
 });
+
+/**
+ * RegExp patterns for DLATK tokenizing.
+ *
+ * @see accentedChars:
+ * Javascript doesn't match accented characters like Python
+ * so this additional code has been inserted into both
+ * the Stanford and DLATK regexps, in the "remaining" pattern:
+ * accentedChars = \u00C0-\u00FF
+ */
+/* eslint-disable prettier/prettier */
+export class DLATK extends PatternContainer {
+  static phoneNumbers = /(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/;
+  static emoticons = /(?:[<>]?[:;=8>][-o*']?[)\]([dDpPxX/:}{@|\\]|[)\]([dDpPxX/:}{@|\\][-o*']?[:;=8<][<>]?|<[/\\]?3|\(?\(?#?[>\-^*+o~][_.|oO,][<\-^*+o~][#;]?\)?\)?)/;
+  static webAddressFull = /(?:(?:http[s]?:\/\/)?(?:[\w_-]+\.)+(?:com|net|gov|edu|info|org|ly|be|gl|co|gs|pr|me|cc|us|gd|nl|ws|am|im|fm|kr|to|jp|sg)(?:\/[\s\b$])?)/;
+  static webStart = /(?:http[s]?:\/\/)/;
+  static command = /(?:\[[\w_]+\])/;
+  static httpGet = /(?:\/\w+\?(?:;?\w+=\w+)+)/;
+  static htmlTags = /(?:<[^>]+\w=[^>]+>|<[^>]+\s\/>|<[^>\s]+>?|<?[^<\s]+>)/;
+  static twitterUsernames = /(?:@[\w_]+)/;
+  static hashtags = /(?:#+[\w_]+[\w'_-]*[\w_]+)/;
+  /** @see "accentedChars" above */
+  static remaining = /(?:[\w\u00C0-\u00FF][\w\u00C0-\u00FF'_-]+[\w\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/u;
+  static pattern = new RegExp(`${DLATK.phoneNumbers.source}|${DLATK.emoticons.source}|${DLATK.webAddressFull.source}|${DLATK.webStart.source}|${DLATK.command.source}|${DLATK.httpGet.source}|${DLATK.htmlTags.source}|${DLATK.twitterUsernames.source}|${DLATK.hashtags.source}|${DLATK.remaining.source}`, 'giu');
+}
+
+/**
+ * RegExp patterns for Stanford tokenizing.
+ *
+ * @see accentedChars:
+ * Javascript doesn't match accented characters like Python
+ * so this additional code has been inserted into both
+ * the Stanford and DLATK regexps, in the "remaining" pattern:
+ * accentedChars = \u00C0-\u00FF
+ */
+/* eslint-disable prettier/prettier */
+export class STANFORD extends PatternContainer {
+  static phoneNumbers = /(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/;
+  static emoticons = /(?:[<>]?[:;=8][-o*']?[)\]([dDpP/:}{@|\\]|[)\]([dDpP/:}{@|\\][-o*']?[:;=8][<>]?)/;
+  static htmlTags = /<[^>]+>/;
+  static twitterUsernames = /(?:@[\w_]+)/;
+  static hashtags = /(?:#+[\w_]+[\w'_-]*[\w_]+)/;
+  /** @see "accentedChars" above */
+  static remaining = /(?:[a-z\u00C0-\u00FF][a-z\u00C0-\u00FF'_-]+[a-z\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/u;
+  static pattern = new RegExp(`${STANFORD.phoneNumbers.source}|${STANFORD.emoticons.source}|${STANFORD.htmlTags.source}|${STANFORD.twitterUsernames.source}|${STANFORD.hashtags.source}|${STANFORD.remaining.source}`, 'giu');
+}
+
+export const HEX_PATTERN = /\\x[0-9a-z]{1,4}/g;
+
+export const HTML_DIGIT_PATTERN = /&#\d+;/g;
+
+export const HTML_ALPHA_PATTERN = /&\w+;/g;
+
+export const AMP_STRING = "&amp;";
+
+export const AND_STRING = " and ";
+
+export const EMPTY_STRING = "";
+
+export const SPECIAL_CHARS = /[\u0300-\u036f]/g;

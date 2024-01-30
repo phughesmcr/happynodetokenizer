@@ -1,28 +1,22 @@
-export type Tokenizer = (input: string) => () => Generator<Token, void, unknown>;
+import { NORMALIZATION_FORM, TOKENIZER_MODE, TOKEN_TAG } from "./constants.js";
 
-export type TokenizerTag =
-  | "phone"
-  | "url"
-  | "url_scheme"
-  | "url_authority"
-  | "url_path_query"
-  | "htmltag"
-  | "emoticon"
-  | "username"
-  | "hashtag"
-  | "word"
-  | "punct"
-  | "<UNK>";
+export abstract class PatternContainer {
+  static pattern: RegExp;
+}
 
-export type TokenizerMode = "stanford" | "dlatk";
+export type Tokenizer = (input: string) => () => IterableIterator<Token>;
 
-export type TokenizerNormalization = "NFC" | "NFD" | "NFKC" | "NFKD" | null;
+export type TokenizerMode = TOKENIZER_MODE;
+
+export type TokenizerNormalizationForm = NORMALIZATION_FORM | null;
+
+export type TokenTag = TOKEN_TAG;
 
 export interface TokenizerOptions {
   /** Defaults to "stanford" */
   mode?: TokenizerMode;
   /** Defaults to `null` */
-  normalize?: TokenizerNormalization;
+  normalize?: TokenizerNormalizationForm;
   /** Defaults to `true` */
   preserveCase?: boolean;
 }
@@ -33,7 +27,7 @@ export type Token = {
   /** The starting position of the match. 0 based. */
   start: number;
   /** The token's type (e.g., "punct" for punctuation) */
-  tag: string;
+  tag: TokenTag;
   /** The token itself */
   value: string;
   /**
@@ -44,10 +38,10 @@ export type Token = {
 };
 
 export type TokenMatchData = {
-  /** The end position of the match. 0 based. */
+  /** The 0-based end position of the match. */
   end: number;
   /** The original match data */
   match: RegExpExecArray;
-  /** The starting position of the match. 0 based. */
+  /** The 0-based starting position of the match. */
   start: number;
 };

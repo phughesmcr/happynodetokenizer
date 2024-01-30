@@ -1,33 +1,16 @@
-/** String tokenizer */
-
+import { DEFAULT_OPTS, TOKENIZER_MODE } from "./constants.js";
 import { normalizeOpts } from "./options.js";
-import { dlatkEmoticons, dlatkTokenizerPattern, stanfordEmoticons, stanfordTokenizerPattern } from "./patterns.js";
-import { htmlToUnicode, normalizeStr, removeHex } from "./strings.js";
+import { createCaseHandler, createCleaner } from "./strings.js";
 import { createTagger } from "./tagger.js";
-import { memoize, noop, pipe } from "./utils.js";
-import type {
-  TokenizerMode,
-  TokenMatchData,
-  TokenizerNormalization,
-  TokenizerOptions,
-  Token,
-  Tokenizer,
-} from "./types.js";
-import { DEFAULT_OPTS, DLATK } from "./constants.js";
-
-/** Creates a function that handles case preservation */
-function createCaseHandler(preserveCase: boolean) {
-  return (emoticons: RegExp) => {
-    return memoize((str: string) => (emoticons.test(str) ? str : preserveCase ? str : str.toLowerCase()));
-  };
-}
+import { cloneRegExp, getPattern } from "./utils.js";
+import type { Token, TokenMatchData, Tokenizer, TokenizerOptions } from "./types.js";
 
 /** Creates a function that returns an array of all RegExp matches */
-function createMatcher(mode: TokenizerMode): (str: string) => Generator<TokenMatchData, void, unknown> {
-  const pattern = mode === DLATK ? dlatkTokenizerPattern : stanfordTokenizerPattern;
-  return function* (str: string) {
+function createMatcher(mode: TOKENIZER_MODE) {
+  const pattern = cloneRegExp(getPattern(mode));
+  return function* (str: string): IterableIterator<TokenMatchData> {
     pattern.lastIndex = 0;
-    let m: RegExpExecArray | null;
+    let m: RegExpExecArray | null = null;
     while ((m = pattern.exec(str))) {
       yield {
         match: m,
@@ -36,27 +19,6 @@ function createMatcher(mode: TokenizerMode): (str: string) => Generator<TokenMat
       };
     }
   };
-}
-
-/** Creates a function that will normalize a string if a valid form is given */
-function createNormalizer(form?: TokenizerNormalization): (str: string) => string {
-  return form ? normalizeStr(form) : noop;
-}
-
-/** Creates a function that replaces hex codes in dlatk mode */
-function createHexReplacer(mode: TokenizerMode): (str: string) => string {
-  return mode === DLATK ? removeHex : noop;
-}
-
-/** Avoid mutating the original string by creating a copy */
-function clone(str: string): string {
-  return String(str);
-}
-
-/** @throws if str is not typeof string */
-function isString(str: string): string {
-  if (typeof str === "string") return str;
-  throw new TypeError("HappyNodeTokenizer: input must be a string.");
 }
 
 /**
@@ -69,34 +31,23 @@ function isString(str: string): string {
  */
 export function tokenizer(opts: TokenizerOptions = DEFAULT_OPTS): Tokenizer {
   const { mode, normalize, preserveCase } = normalizeOpts(opts);
-
-  // string cleaning functions
-  const replaceHex = createHexReplacer(mode);
-  const normalizer = createNormalizer(normalize);
-  const cleaner = pipe<string>(isString, clone, htmlToUnicode, replaceHex, normalizer);
-  // RegExp matching and tagging
-  const match = createMatcher(mode);
-  const tag = createTagger(mode);
-  // case handling
-  const emoticons = mode === DLATK ? dlatkEmoticons : stanfordEmoticons;
-  const handleCase = createCaseHandler(preserveCase)(emoticons);
-
-  return function (input: string) {
-    const matches = match(cleaner(input));
-    return function* () {
+  const caseHandler = createCaseHandler(preserveCase, mode);
+  const cleaner = createCleaner(mode, normalize);
+  const matcher = createMatcher(mode);
+  const tagger = createTagger(mode);
+  return (input: string) => {
+    const matches = matcher(cleaner(input));
+    return function* (): IterableIterator<Token> {
       for (const { match, start, end } of matches) {
-        const orig = match[0];
-        const value = handleCase(orig);
-        const token: Token = {
+        const original = match[0];
+        const value = caseHandler(original);
+        yield {
           end,
           start,
-          tag: tag(value),
+          tag: tagger(value),
           value,
+          variation: value !== original ? original : undefined,
         };
-        if (value !== orig) {
-          token.variation = orig;
-        }
-        yield token;
       }
     };
   };

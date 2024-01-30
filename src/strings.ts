@@ -1,15 +1,16 @@
-/** String cleaning */
-
-import * as he from "he";
-import { pipe } from "./utils.js";
-
-const HEX_PATTERN = /\\x[0-9a-z]{1,4}/g;
-const HTML_DIGIT_PATTERN = /&#\d+;/g;
-const HTML_ALPHA_PATTERN = /&\w+;/g;
-const AMP_STRING = "&amp;";
-const AND_STRING = " and ";
-const EMPTY_STRING = "";
-const SPECIAL_CHARS = /[\u0300-\u036f]/g;
+import he from "he";
+import {
+  AMP_STRING,
+  AND_STRING,
+  EMPTY_STRING,
+  HEX_PATTERN,
+  HTML_ALPHA_PATTERN,
+  HTML_DIGIT_PATTERN,
+  SPECIAL_CHARS,
+  TOKENIZER_MODE,
+} from "./constants.js";
+import { TokenizerMode, TokenizerNormalizationForm } from "./types.js";
+import { cloneRegExp, getEmoticonPattern, memoize, noop, pipe } from "./utils.js";
 
 export function normalizeStr(form?: string): (str: string) => string {
   return (str: string) => str.normalize(form).replace(SPECIAL_CHARS, EMPTY_STRING);
@@ -23,21 +24,60 @@ export function replaceAmp(str: string): string {
   return str.replace(AMP_STRING, AND_STRING);
 }
 
-function _parseDigit(match: string): string {
-  const char = parseInt(match.substring(2), 10);
-  return String.fromCharCode(char);
+function getChar(match: string) {
+  return parseInt(match.substring(2), 10);
+}
+
+function parseDigit(match: string): string {
+  return String.fromCharCode(getChar(match));
 }
 
 export function replaceDigits(str: string): string {
-  return str.replace(HTML_DIGIT_PATTERN, _parseDigit);
+  return str.replace(HTML_DIGIT_PATTERN, parseDigit);
 }
 
-function _decode(match: string): string {
+function decode(match: string): string {
   return he.decode(match);
 }
 
 export function replaceAlpha(str: string): string {
-  return str.replace(HTML_ALPHA_PATTERN, _decode);
+  return str.replace(HTML_ALPHA_PATTERN, decode);
 }
 
-export const htmlToUnicode = pipe<string>(replaceAmp, replaceDigits, replaceAlpha);
+export const htmlToUnicode = pipe<string, string>(replaceAmp, replaceDigits, replaceAlpha);
+
+/** Creates a function that will normalize a string if a valid form is given */
+function createNormalizer(form?: TokenizerNormalizationForm): (str: string) => string {
+  return form ? normalizeStr(form) : noop;
+}
+
+/** Creates a function that replaces hex codes in dlatk mode */
+function createHexReplacer(mode: TokenizerMode): (str: string) => string {
+  return mode === TOKENIZER_MODE.DLATK ? removeHex : noop;
+}
+
+/** Avoid mutating the original string by creating a copy */
+function clone(str: string): string {
+  return String(str);
+}
+
+/** @throws if str is not typeof string */
+function isString(str: string): string {
+  if (typeof str === "string") return str;
+  throw new TypeError("HappyNodeTokenizer: input must be a string.");
+}
+
+/** Creates a function that handles case preservation */
+export function createCaseHandler(preserveCase: boolean, mode: TokenizerMode) {
+  const clonePattern = cloneRegExp(getEmoticonPattern(mode));
+  return memoize((str: string) => (clonePattern.test(str) ? str : preserveCase ? str : str.toLowerCase()));
+}
+
+export function createCleaner(
+  mode: TokenizerMode,
+  normalize: TokenizerNormalizationForm = null
+): (input: string) => string {
+  const replaceHex = createHexReplacer(mode);
+  const normalizer = createNormalizer(normalize);
+  return pipe<string, string>(isString, clone, htmlToUnicode, replaceHex, normalizer);
+}

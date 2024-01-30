@@ -2,73 +2,36 @@
   "name": "happynodetokenizer",
   "version": "6.1.0",
   "description": "A simple, Twitter-aware tokenizer.",
-  "main": "dist/cjs/index.min.js",
-  "module": "dist/esm/index.min.js",
-  "browser": "dist/iife/index.min.js",
-  "types": "dist/cjs/index.d.ts",
+  "main": "build/index.js",
+  "module": "build/index.js",
+  "types": "build/index.d.ts",
   "type": "module",
   "exports": {
-    "require": "./dist/umd/index.min.js",
-    "import": "./dist/esm/index.min.js",
-    "node": "./dist/cjs/index.min.js",
-    "browser": "./dist/iife/index.min.js"
+    "import": "./build/index.js"
   },
   "directories": {
-    "dist": "dist",
-    "doc": "docs",
+    "build": "build",
     "test": "test"
   },
   "devDependencies": {
-    "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.20.5",
-    "@babel/preset-env": "^7.20.2",
-    "@babel/preset-typescript": "^7.18.6",
-    "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^23.0.4",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-replace": "^5.0.1",
-    "@types/chai": "^4.3.4",
-    "@types/he": "^1.1.2",
-    "@types/node": "^18.11.13",
-    "@typescript-eslint/eslint-plugin": "^5.46.0",
-    "@typescript-eslint/parser": "^5.46.0",
-    "caniuse-lite": "^1.0.30001439",
-    "chai": "^4.3.7",
-    "eslint": "^8.29.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "esm": "^3.2.25",
-    "he": "^1.2.0",
-    "prettier": "^2.8.1",
-    "prettier-eslint": "^15.0.1",
-    "rimraf": "^3.0.2",
-    "rollup": "^3.7.3",
-    "rollup-plugin-dts": "^5.0.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.34.1",
-    "ts-node": "^10.9.1",
-    "tslib": "^2.4.1",
-    "typedoc": "^0.23.22",
-    "typescript": "^4.9.4"
+    "@types/he": "^1.2.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   },
   "scripts": {
-    "prebuild": "npm run clean:pre && npm run lint:fix",
-    "build": "npm run build:types && rollup -c rollup.config.js",
-    "postbuild": "npm run clean:post",
-    "build:docs": "npx typedoc src/index.ts --out docs",
-    "build:types": "tsc --emitDeclarationOnly --declaration --declarationDir types",
-    "clean": "npm run clean:pre && npm run clean:post && npm run clean:docs",
-    "clean:docs": "rimraf docs",
-    "clean:pre": "rimraf build && rimraf dist && rimraf types",
-    "clean:post": "rimraf types",
-    "lint": "eslint \"src/**/*.ts\"",
-    "lint:fix": "eslint --fix \"src/**/*.ts\"",
+    "prebuild": "npm run clean",
+    "build": "tsc",
+    "postbuild": "rimraf types",
+    "clean": "rimraf build && rimraf dist && rimraf types",
     "check:types": "tsc --noEmit",
     "test": "node test/test.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/phugh/happynodetokenizer"
+    "url": "https://github.com/phughesmcr/happynodetokenizer"
   },
   "keywords": [
     "tokenise",
@@ -89,15 +52,15 @@
   ],
   "author": {
     "name": "Peter Hughes",
-    "email": "peter@phugh.es",
+    "email": "github@phugh.es",
     "url": "https://www.phugh.es"
   },
   "license": "CC-BY-NC-SA-3.0",
   "bugs": {
-    "url": "https://github.com/phugh/happynodetokenizer/issues"
+    "url": "https://github.com/phughesmcr/happynodetokenizer/issues"
   },
-  "homepage": "https://github.com/phugh/happynodetokenizer",
+  "homepage": "https://github.com/phughesmcr/happynodetokenizer",
   "dependencies": {
-    "core-js": "^3.26.1"
+    "he": "^1.2.0"
   }
 }
