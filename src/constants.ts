@@ -33,7 +33,6 @@ export const DEFAULT_OPTS: Readonly<TokenizerOptions> = Object.freeze({
  * the Stanford and DLATK regexps, in the "remaining" pattern:
  * accentedChars = \u00C0-\u00FF
  */
-/* eslint-disable prettier/prettier */
 export class DLATK extends PatternContainer {
   static phoneNumbers = /(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/;
   static emoticons = /(?:[<>]?[:;=8>][-o*']?[)\]([dDpPxX/:}{@|\\]|[)\]([dDpPxX/:}{@|\\][-o*']?[:;=8<][<>]?|<[/\\]?3|\(?\(?#?[>\-^*+o~][_.|oO,][<\-^*+o~][#;]?\)?\)?)/;
@@ -58,7 +57,6 @@ export class DLATK extends PatternContainer {
  * the Stanford and DLATK regexps, in the "remaining" pattern:
  * accentedChars = \u00C0-\u00FF
  */
-/* eslint-disable prettier/prettier */
 export class STANFORD extends PatternContainer {
   static phoneNumbers = /(?:(?:\+?[01][-\s.]*)?(?:[(]?\d{3}[-\s.)]*)?\d{3}[-\s.]*\d{4})/;
   static emoticons = /(?:[<>]?[:;=8][-o*']?[)\]([dDpP/:}{@|\\]|[)\]([dDpP/:}{@|\\][-o*']?[:;=8][<>]?)/;
