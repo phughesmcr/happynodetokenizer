@@ -11,17 +11,24 @@ A Typescript port of [HappyFunTokenizer.py](https://github.com/stanfordnlp/pytho
 * Customizable and easy to use
 
 ## Install
+
+### NPM
 ```bash
   npm install --save happynodetokenizer
+```
+
+### JSR (Deno / Bun)
+```bash
+bunx jsr i @phughesmcr/happynodetokenizer
 ```
 
 ## Usage
 HappyNodeTokenizer exports a function called `tokenizer()` which takes an optional configuration object *(See "The Options Object" below)*.
 
-
 ### Example
 ```javascript
 import { tokenizer } from 'happynodetokenizer';
+// or import * as mod from "@phughesmcr/happynodetokenizer"; if using JSR
 
 const text = 'RT @ #happyfuncoding: this is a typical Twitter tweet :-)';
 
