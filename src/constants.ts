@@ -1,5 +1,10 @@
 import { PatternContainer, TokenizerMode, TokenizerNormalizationForm, TokenizerOptions } from "./types.js";
 
+/**
+ * Various constants used throughout the tokenizer.
+ * @module
+ */
+
 export class UTIL_PATTERNS {
   static HTMLTAG = /[a-zA-Z]{2,}/g;
   static MODE = /dlatk|stanford/;

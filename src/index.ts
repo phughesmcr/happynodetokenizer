@@ -11,8 +11,7 @@
  * and
  * HappierFunTokenizing.py by H. Andrew Schwartz (www.wwbp.org)
  *
- * @name         HappyNodeTokenizer
- * @file         index.js
+ * @module       HappyNodeTokenizer
  * @description  A basic Twitter-aware tokenizer.
  * @exports      tokenize
  * @author       P. Hughes <github@phugh.es> (https://www.phugh.es)
@@ -36,19 +35,6 @@
  *                                // true   = preserve case
  *                                // false  = tokens are returned in lower case
  * }
- *
- * @example
- *  import { tokenizer } from "happynodetokenizer";
- *  const text = "A big long string of text...";
- *  const opts = {
- *      "mode": "stanford",
- *      "normalize": null,
- *      "preserveCase": true,
- *  };
- *  const tokenize = tokenizer(opts);  // (input: string) => IterableIterator<Token>;
- *  const tokens = tokenize(text);     // IterableIterator<Token>;
- *  const strings = Array.from(tokens, (token) => token.value); // string[]
- *  console.log(values); // ["a", "big", "long", "string", "of", "text", "..."]
  */
 
 export { tokenizer } from "./tokenizer.js";

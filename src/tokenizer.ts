@@ -28,6 +28,19 @@ function createMatcher(mode: TokenizerMode) {
  * @param opts.normalize Normalization form, disabled if null. Available options: "NFC" | "NFD" | "NFKC" | "NFKD". Defaults to null.
  * @param opts.preserveCase Preserve the tokens' case; does not affect emoticons. Defaults to `true`.
  * @returns the tokenizer function
+ *
+ * @example
+ * import { tokenizer } from "happynodetokenizer";
+ * const text = "A big long string of text...";
+ * const opts = {
+ *     "mode": "stanford",
+ *     "normalize": null,
+ *     "preserveCase": true,
+ * };
+ * const tokenize = tokenizer(opts);  // (input: string) => IterableIterator<Token>;
+ * const tokens = tokenize(text);     // IterableIterator<Token>;
+ * const strings = Array.from(tokens, (token) => token.value); // string[]
+ * console.log(values); // ["a", "big", "long", "string", "of", "text", "..."]
  */
 export function tokenizer(opts: TokenizerOptions = DEFAULT_OPTS): Tokenizer {
   const { mode, normalize, preserveCase } = normalizeOpts(opts);

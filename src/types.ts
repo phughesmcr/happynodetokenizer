@@ -4,10 +4,16 @@ export abstract class PatternContainer {
 
 export type Tokenizer = (input: string) => () => IterableIterator<Token>;
 
+/** The tokenizer methodology */
 export type TokenizerMode = "stanford" | "dlatk";
 
+/**
+ * String normalization form
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize}
+ */
 export type TokenizerNormalizationForm = "NFC" | "NFD" | "NFKC" | "NFKD" | null;
 
+/** The token type */
 export type TokenTag = "phone" | "url" | "url_scheme" | "url_authority" | "url_path_query" | "htmltag" | "emoticon" | "username" | "hashtag" | "word" | "punct" | "<UNK>";
 
 export interface TokenizerOptions {
@@ -19,6 +25,7 @@ export interface TokenizerOptions {
   preserveCase?: boolean;
 }
 
+/** The output of the tokenizer */
 export type Token = {
   /** The end position of the match. 0 based. */
   end: number;
