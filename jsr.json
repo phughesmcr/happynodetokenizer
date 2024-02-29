@@ -1,0 +1,5 @@
+{
+  "name": "@phughesmcr/simplengrams",
+  "version": "7.1.0",
+  "exports": "./src/index.ts"
+}
