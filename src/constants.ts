@@ -1,4 +1,4 @@
-import { PatternContainer, TokenizerNormalizationForm, TokenizerOptions } from "./types.js";
+import { PatternContainer, TokenizerMode, TokenizerNormalizationForm, TokenizerOptions } from "./types.js";
 
 export class UTIL_PATTERNS {
   static HTMLTAG = /[a-zA-Z]{2,}/g;
@@ -7,35 +7,8 @@ export class UTIL_PATTERNS {
   static WORD = /\w/;
 }
 
-export const enum TOKENIZER_MODE {
-  "STANFORD" = "stanford",
-  "DLATK" = "dlatk",
-}
-
-export const enum TOKEN_TAG {
-  PHONE = "phone",
-  URL = "url",
-  URL_SCHEME = "url_scheme",
-  URL_AUTHORITY = "url_authority",
-  URL_PATH_QUERY = "url_path_query",
-  HTMLTAG = "htmltag",
-  EMOTICON = "emoticon",
-  USERNAME = "username",
-  HASHTAG = "hashtag",
-  WORD = "word",
-  PUNCTUATION = "punct",
-  UNKNOWN = "<UNK>",
-}
-
-export const enum NORMALIZATION_FORM {
-  "NFC" = "NFC",
-  "NFD" = "NFD",
-  "NFKC" = "NFKC",
-  "NFKD" = "NFKD",
-}
-
 export class DEFAULTS {
-  static MODE: TOKENIZER_MODE = TOKENIZER_MODE.STANFORD;
+  static MODE: TokenizerMode = "stanford";
   static NORMALIZE: TokenizerNormalizationForm = null;
   static PRESERVE_CASE = true;
 }
@@ -68,7 +41,7 @@ export class DLATK extends PatternContainer {
   static hashtags = /(?:#+[\w_]+[\w'_-]*[\w_]+)/;
   /** @see "accentedChars" above */
   static remaining = /(?:[\w\u00C0-\u00FF][\w\u00C0-\u00FF'_-]+[\w\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/u;
-  static pattern = new RegExp(`${DLATK.phoneNumbers.source}|${DLATK.emoticons.source}|${DLATK.webAddressFull.source}|${DLATK.webStart.source}|${DLATK.command.source}|${DLATK.httpGet.source}|${DLATK.htmlTags.source}|${DLATK.twitterUsernames.source}|${DLATK.hashtags.source}|${DLATK.remaining.source}`, 'giu');
+  static override pattern = new RegExp(`${DLATK.phoneNumbers.source}|${DLATK.emoticons.source}|${DLATK.webAddressFull.source}|${DLATK.webStart.source}|${DLATK.command.source}|${DLATK.httpGet.source}|${DLATK.htmlTags.source}|${DLATK.twitterUsernames.source}|${DLATK.hashtags.source}|${DLATK.remaining.source}`, 'giu');
 }
 
 /**
@@ -89,7 +62,7 @@ export class STANFORD extends PatternContainer {
   static hashtags = /(?:#+[\w_]+[\w'_-]*[\w_]+)/;
   /** @see "accentedChars" above */
   static remaining = /(?:[a-z\u00C0-\u00FF][a-z\u00C0-\u00FF'_-]+[a-z\u00C0-\u00FF])|(?:[+-]?\d+[,/.:-]\d+[+-]?)|(?:[\w_]+)|(?:\.(?:\s*\.){1,})|(?:\S)/u;
-  static pattern = new RegExp(`${STANFORD.phoneNumbers.source}|${STANFORD.emoticons.source}|${STANFORD.htmlTags.source}|${STANFORD.twitterUsernames.source}|${STANFORD.hashtags.source}|${STANFORD.remaining.source}`, 'giu');
+  static override pattern = new RegExp(`${STANFORD.phoneNumbers.source}|${STANFORD.emoticons.source}|${STANFORD.htmlTags.source}|${STANFORD.twitterUsernames.source}|${STANFORD.hashtags.source}|${STANFORD.remaining.source}`, 'giu');
 }
 
 export const HEX_PATTERN = /\\x[0-9a-z]{1,4}/g;

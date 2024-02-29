@@ -1,4 +1,4 @@
-import { DEFAULTS, DEFAULT_OPTS, TOKENIZER_MODE, UTIL_PATTERNS } from "./constants.js";
+import { DEFAULTS, DEFAULT_OPTS, UTIL_PATTERNS } from "./constants.js";
 import type { TokenizerMode, TokenizerNormalizationForm, TokenizerOptions } from "./types.js";
 
 function normalizeMode(mode: TokenizerMode): TokenizerMode {
@@ -7,7 +7,7 @@ function normalizeMode(mode: TokenizerMode): TokenizerMode {
   }
   const _mode = mode.toLowerCase();
   if (!UTIL_PATTERNS.MODE.exec(_mode)) {
-    throw new SyntaxError(`"mode" must be "${TOKENIZER_MODE.STANFORD}" or "${TOKENIZER_MODE.DLATK}". Found "${mode}".`);
+    throw new SyntaxError(`"mode" must be "stanford" or "dlatk". Found "${mode}".`);
   }
   return _mode as TokenizerMode;
 }

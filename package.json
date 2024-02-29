@@ -2,15 +2,15 @@
   "name": "happynodetokenizer",
   "version": "7.0.0",
   "description": "A simple, Twitter-aware tokenizer.",
-  "main": "build/index.js",
-  "module": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
-    "import": "./build/index.js"
+    "import": "./dist/index.js"
   },
   "directories": {
-    "build": "build",
+    "dist": "dist",
     "test": "test"
   },
   "devDependencies": {

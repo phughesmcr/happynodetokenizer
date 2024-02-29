@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { DLATK, STANFORD, TOKENIZER_MODE } from "./constants.js";
+import { DLATK, STANFORD } from "./constants.js";
+import { TokenizerMode } from "./types.js";
 
 export function pipe<T, R>(...fns: ((...args: any[]) => any)[]) {
   return (value: T): T & R => fns.reduce((acc: T & R, fn: (...args: any[]) => T & R) => fn(acc), value as T & R);
@@ -29,10 +30,10 @@ export function cloneRegExp(pattern: RegExp): RegExp {
   return new RegExp(pattern.source, pattern.flags);
 }
 
-export function getEmoticonPattern(mode: TOKENIZER_MODE): RegExp {
-  return mode === TOKENIZER_MODE.DLATK ? DLATK.emoticons : STANFORD.emoticons;
+export function getEmoticonPattern(mode: TokenizerMode): RegExp {
+  return mode === "dlatk" ? DLATK.emoticons : STANFORD.emoticons;
 }
 
-export function getPattern(mode: TOKENIZER_MODE): RegExp {
-  return mode === TOKENIZER_MODE.DLATK ? DLATK.pattern : STANFORD.pattern;
+export function getPattern(mode: TokenizerMode): RegExp {
+  return mode === "dlatk" ? DLATK.pattern : STANFORD.pattern;
 }

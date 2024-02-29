@@ -1,16 +1,14 @@
-import { NORMALIZATION_FORM, TOKENIZER_MODE, TOKEN_TAG } from "./constants.js";
-
 export abstract class PatternContainer {
   static pattern: RegExp;
 }
 
 export type Tokenizer = (input: string) => () => IterableIterator<Token>;
 
-export type TokenizerMode = TOKENIZER_MODE;
+export type TokenizerMode = "stanford" | "dlatk";
 
-export type TokenizerNormalizationForm = NORMALIZATION_FORM | null;
+export type TokenizerNormalizationForm = "NFC" | "NFD" | "NFKC" | "NFKD" | null;
 
-export type TokenTag = TOKEN_TAG;
+export type TokenTag = "phone" | "url" | "url_scheme" | "url_authority" | "url_path_query" | "htmltag" | "emoticon" | "username" | "hashtag" | "word" | "punct" | "<UNK>";
 
 export interface TokenizerOptions {
   /** Defaults to "stanford" */
@@ -34,7 +32,7 @@ export type Token = {
    * Only present when preserveCase === true.
    * The token's original value as matched, without any case modification.
    */
-  variation?: string;
+  variation?: string | undefined;
 };
 
 export type TokenMatchData = {

@@ -6,8 +6,7 @@ import {
   HEX_PATTERN,
   HTML_ALPHA_PATTERN,
   HTML_DIGIT_PATTERN,
-  SPECIAL_CHARS,
-  TOKENIZER_MODE,
+  SPECIAL_CHARS
 } from "./constants.js";
 import { TokenizerMode, TokenizerNormalizationForm } from "./types.js";
 import { cloneRegExp, getEmoticonPattern, memoize, noop, pipe } from "./utils.js";
@@ -53,7 +52,7 @@ function createNormalizer(form?: TokenizerNormalizationForm): (str: string) => s
 
 /** Creates a function that replaces hex codes in dlatk mode */
 function createHexReplacer(mode: TokenizerMode): (str: string) => string {
-  return mode === TOKENIZER_MODE.DLATK ? removeHex : noop;
+  return mode === "dlatk" ? removeHex : noop;
 }
 
 /** Avoid mutating the original string by creating a copy */

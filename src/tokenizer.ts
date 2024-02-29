@@ -1,12 +1,12 @@
-import { DEFAULT_OPTS, TOKENIZER_MODE } from "./constants.js";
+import { DEFAULT_OPTS } from "./constants.js";
 import { normalizeOpts } from "./options.js";
 import { createCaseHandler, createCleaner } from "./strings.js";
 import { createTagger } from "./tagger.js";
+import type { Token, TokenMatchData, Tokenizer, TokenizerMode, TokenizerOptions } from "./types.js";
 import { cloneRegExp, getPattern } from "./utils.js";
-import type { Token, TokenMatchData, Tokenizer, TokenizerOptions } from "./types.js";
 
 /** Creates a function that returns an array of all RegExp matches */
-function createMatcher(mode: TOKENIZER_MODE) {
+function createMatcher(mode: TokenizerMode) {
   const pattern = cloneRegExp(getPattern(mode));
   return function* (str: string): IterableIterator<TokenMatchData> {
     pattern.lastIndex = 0;

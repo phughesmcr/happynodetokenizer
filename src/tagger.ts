@@ -1,65 +1,65 @@
-import { DLATK, UTIL_PATTERNS, STANFORD, TOKENIZER_MODE, TOKEN_TAG } from "./constants.js";
-import { memoize } from "./utils.js";
+import { DLATK, STANFORD, UTIL_PATTERNS } from "./constants.js";
 import type { TokenTag, TokenizerMode } from "./types.js";
+import { memoize } from "./utils.js";
 
 export function getDlatkTag(token: string): TokenTag {
   switch (true) {
     case DLATK.phoneNumbers.test(token):
-      return TOKEN_TAG.PHONE;
+      return "phone";
     case DLATK.webAddressFull.test(token):
-      return TOKEN_TAG.URL;
+      return "url";
     case DLATK.webStart.test(token):
-      return TOKEN_TAG.URL_SCHEME;
+      return "url_scheme";
     case DLATK.command.test(token):
-      return TOKEN_TAG.URL_AUTHORITY;
+      return "url_authority";
     case DLATK.httpGet.test(token):
-      return TOKEN_TAG.URL_PATH_QUERY;
+      return "url_path_query";
     case DLATK.htmlTags.test(token) &&
       (!DLATK.emoticons.test(token) || (DLATK.emoticons.test(token) && UTIL_PATTERNS.HTMLTAG.test(token))):
-      return TOKEN_TAG.HTMLTAG;
+      return "htmltag";
     case DLATK.emoticons.test(token):
-      return TOKEN_TAG.EMOTICON;
+      return "emoticon";
     case DLATK.twitterUsernames.test(token):
-      return TOKEN_TAG.USERNAME;
+      return "username";
     case DLATK.hashtags.test(token):
-      return TOKEN_TAG.HASHTAG;
+      return "hashtag";
     case DLATK.remaining.test(token):
       if (UTIL_PATTERNS.WORD.test(token)) {
-        return TOKEN_TAG.WORD;
+        return "word";
       } else {
-        return TOKEN_TAG.PUNCTUATION;
+        return "punct";
       }
     default:
-      return TOKEN_TAG.UNKNOWN;
+      return "<UNK>";
   }
 }
 
 export function getStanfordTag(token: string): TokenTag {
   switch (true) {
     case STANFORD.phoneNumbers.test(token):
-      return TOKEN_TAG.PHONE;
+      return "phone";
     case STANFORD.htmlTags.test(token) &&
       (!STANFORD.emoticons.test(token) || (STANFORD.emoticons.test(token) && UTIL_PATTERNS.HTMLTAG.test(token))):
-      return TOKEN_TAG.HTMLTAG;
+      return "htmltag";
     case STANFORD.emoticons.test(token):
-      return TOKEN_TAG.EMOTICON;
+      return "emoticon";
     case STANFORD.twitterUsernames.test(token):
-      return TOKEN_TAG.USERNAME;
+      return "username";
     case STANFORD.hashtags.test(token):
-      return TOKEN_TAG.HASHTAG;
+      return "hashtag";
     case STANFORD.remaining.test(token):
       if (UTIL_PATTERNS.WORD.test(token)) {
-        return TOKEN_TAG.WORD;
+        return "word";
       } else {
-        return TOKEN_TAG.PUNCTUATION;
+        return "punct";
       }
     default:
-      return TOKEN_TAG.UNKNOWN;
+      return "<UNK>";
   }
 }
 
 export function createTagger(mode: TokenizerMode): (str: string) => TokenTag {
-  return mode === TOKENIZER_MODE.DLATK
+  return mode === "dlatk"
     ? memoize<string, TokenTag>(getDlatkTag)
     : memoize<string, TokenTag>(getStanfordTag);
 }

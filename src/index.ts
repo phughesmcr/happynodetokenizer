@@ -52,5 +52,5 @@
  */
 
 export { tokenizer } from "./tokenizer.js";
-export type { Token } from "./types.js";
+export type { Token, TokenTag, TokenizerMode, TokenizerNormalizationForm } from "./types.js";
 
