@@ -1,6 +1,6 @@
 {
   "name": "happynodetokenizer",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "A simple, Twitter-aware tokenizer.",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/phughesmcr/happynodetokenizer"
+    "url": "git+https://github.com/phughesmcr/happynodetokenizer.git"
   },
   "keywords": [
     "tokenise",
