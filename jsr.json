@@ -1,5 +1,5 @@
 {
-  "name": "@phughesmcr/simplengrams",
+  "name": "@phughesmcr/happynodetokenizer",
   "version": "7.1.0",
   "exports": "./src/index.ts"
 }
